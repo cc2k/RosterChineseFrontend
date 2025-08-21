@@ -1,0 +1,45 @@
+.header {
+  display: flex;
+  justify-content: space-between; /* Space between left and right elements */
+  align-items: center;
+  padding: 20px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+  position: relative; /* Needed for absolute centering of the title */
+}
+
+.header-content {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.header-title {
+  position: absolute; /* Absolutely center the title */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.header-link {
+  background: none;
+  position: absolute;
+  right: -45%;
+  border: none;
+  color: #007bff;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none; /* Remove default underline */
+  padding: 0;
+}
+
+.header-link:hover {
+  color: #0056b3;
+  text-decoration: none; /* Ensure no underline is added */
+}
+
+.header-link:focus {
+  outline: none; /* Remove focus outline */
+}
