@@ -17,7 +17,8 @@ function Header() {
   return (
     <header className="header">
       <div className="header-content">
-        <h1 className="header-title">Tong ah</h1>
+        <h1 className="header-title">Tong ah
+        </h1>
         <button className="header-link" onClick={handleButtonClick}>
           {isLoggedIn ? 'Logout' : 'Login'}
         </button>

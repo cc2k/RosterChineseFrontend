@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; // Import the AuthContext
 import '../css/Navbar.css';
 
-function Navbar() {
+function NavbarVertical() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isLoggedIn } = useAuth(); // Get login status from context
 
@@ -19,13 +19,13 @@ function Navbar() {
   return (
     <>
       {/* Hamburger Icon */}
-      <div className="hamburger" onClick={toggleMenu}>
+      <div className="hamburger-vertical" onClick={toggleMenu}>
         ☰
       </div>
 
       {/* Navbar */}
-      <nav className={`navbar ${isMenuOpen ? 'open' : ''}`}>
-        <ul className="nav-links">
+      <nav className={`navbar-vertical ${isMenuOpen ? 'open' : ''}`}>
+        <ul className="nav-vertical-links">
           <li>
             <Link to="/" onClick={toggleMenu}>Login</Link>
           </li>
@@ -41,4 +41,4 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+export default NavbarVertical;

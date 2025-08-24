@@ -25,8 +25,8 @@
 
 .header-link {
   background: none;
-  position: absolute;
-  right: -45%;
+  width: auto; /* Allow the link to take its natural width */
+  margin-left: auto; /* Push the link to the right */
   border: none;
   color: #007bff;
   font-size: 14px;

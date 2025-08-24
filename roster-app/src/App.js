@@ -4,19 +4,19 @@ import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import RosterPage from './pages/RosterPage';
 import WelcomePage from './pages/WelcomePage'; 
-import Header from './components/Header';
-import Navbar from './components/Navbar';
+import NavbarVertical from './components/NavbarVertical';
+import NavbarHorizontal from './components/NavbarHorizontal';
 
 function App() {
   const location = useLocation();
 
   // Define routes where the Navbar should be visible
-  const showNavbar = location.pathname !== '/' && location.pathname !== '/login';
+  const showNavbarVertical = location.pathname !== '/' && location.pathname !== '/login';
 
   return (
     <>
-    <Header />
-    {showNavbar && <Navbar />}
+    <NavbarHorizontal />
+    {showNavbarVertical && <NavbarVertical />}
     
       <Routes>
         <Route path="/" element={<WelcomePage/>} />
