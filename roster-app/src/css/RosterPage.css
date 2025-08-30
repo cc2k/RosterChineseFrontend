@@ -1,3 +1,4 @@
+
 .roster-container {
     display: flex;
     flex-direction: column;
@@ -17,4 +18,26 @@
 .roster-content {
     font-size: 1.2rem;
     color: #555;
+}
+
+/* Weekday squares styling */
+.weekday-square {
+    flex: 1 1 0;
+    min-width: 120px;
+    max-width: 160px;
+    min-height: 120px;
+    max-height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background: #e0e0e0;
+    padding: 30px 10px;
+    text-align: center;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 2rem;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    margin: 0 5px;
 }

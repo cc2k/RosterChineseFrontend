@@ -3,81 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import initialUsers from '../data/users.json';
 import '../css/RosterPage.css';
+import { getWeekDates, getMondays, initialFreeShifts } from '../components/DateSelector';
 
-// Helper to get all Mondays in a month
-function getMondays(year, month) {
-  const mondays = [];
-  const date = new Date(year, month, 1);
-  // Find first Monday
-  while (date.getDay() !== 1) {
-    date.setDate(date.getDate() + 1);
-  }
-  while (date.getMonth() === month) {
-    mondays.push(new Date(date));
-    date.setDate(date.getDate() + 7);
-  }
-  return mondays;
-}
 
-// Helper to get week dates (Mon-Sun) for a given Monday
-function getWeekDates(monday) {
-  const week = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    week.push({
-      label: d.toLocaleDateString('en-US', { weekday: 'short' }),
-      date: d.toISOString().slice(0, 10)
-    });
-  }
-  return week;
-}
-
-// Initial free shifts for testing (2025 and 2026)
-const initialFreeShifts = [
-  // 2025
-  { "date": "2025-01-02", "position": "restaurant" }, { "date": "2025-01-09", "position": "driver" }, { "date": "2025-01-16", "position": "kitchen" },
-  { "date": "2025-02-06", "position": "take-out" }, { "date": "2025-02-13", "position": "restaurant" }, { "date": "2025-02-20", "position": "driver" },
-  { "date": "2025-03-06", "position": "kitchen" }, { "date": "2025-03-13", "position": "take-out" }, { "date": "2025-03-20", "position": "restaurant" },
-  { "date": "2025-04-03", "position": "driver" }, { "date": "2025-04-10", "position": "kitchen" }, { "date": "2025-04-17", "position": "take-out" },
-  { "date": "2025-05-01", "position": "restaurant" }, { "date": "2025-05-08", "position": "driver" }, { "date": "2025-05-15", "position": "kitchen" },
-  { "date": "2025-06-05", "position": "take-out" }, { "date": "2025-06-12", "position": "restaurant" }, { "date": "2025-06-19", "position": "driver" },
-  { "date": "2025-07-03", "position": "kitchen" }, { "date": "2025-07-10", "position": "take-out" }, { "date": "2025-07-17", "position": "restaurant" },
-  { "date": "2025-08-07", "position": "driver" }, { "date": "2025-08-14", "position": "kitchen" }, { "date": "2025-08-21", "position": "take-out" },
-  { "date": "2025-09-04", "position": "restaurant" }, { "date": "2025-09-11", "position": "driver" }, { "date": "2025-09-18", "position": "kitchen" },
-  { "date": "2025-10-02", "position": "take-out" }, { "date": "2025-10-09", "position": "restaurant" }, { "date": "2025-10-16", "position": "driver" },
-  { "date": "2025-11-06", "position": "kitchen" }, { "date": "2025-11-13", "position": "take-out" }, { "date": "2025-11-20", "position": "restaurant" },
-  { "date": "2025-12-04", "position": "driver" }, { "date": "2025-12-11", "position": "kitchen" }, { "date": "2025-12-18", "position": "take-out" },
-  { "date": "2025-01-23", "position": "restaurant" }, { "date": "2025-02-27", "position": "driver" }, { "date": "2025-03-27", "position": "kitchen" },
-  { "date": "2025-04-24", "position": "take-out" }, { "date": "2025-05-22", "position": "restaurant" }, { "date": "2025-06-26", "position": "driver" },
-  { "date": "2025-07-24", "position": "kitchen" }, { "date": "2025-08-28", "position": "take-out" }, { "date": "2025-09-25", "position": "restaurant" },
-  { "date": "2025-10-23", "position": "driver" }, { "date": "2025-11-27", "position": "kitchen" }, { "date": "2025-12-25", "position": "take-out" },
-  { "date": "2025-01-30", "position": "restaurant" }, { "date": "2025-02-20", "position": "driver" }, { "date": "2025-03-20", "position": "kitchen" },
-  { "date": "2025-04-17", "position": "take-out" }, { "date": "2025-05-15", "position": "restaurant" }, { "date": "2025-06-19", "position": "driver" },
-  { "date": "2025-07-17", "position": "kitchen" }, { "date": "2025-08-21", "position": "take-out" }, { "date": "2025-09-18", "position": "restaurant" },
-  { "date": "2025-10-16", "position": "driver" }, { "date": "2025-11-20", "position": "kitchen" }, { "date": "2025-12-18", "position": "take-out" },
-  // 2026 (same pattern as 2025)
-  { "date": "2026-01-02", "position": "restaurant" }, { "date": "2026-01-09", "position": "driver" }, { "date": "2026-01-16", "position": "kitchen" },
-  { "date": "2026-02-06", "position": "take-out" }, { "date": "2026-02-13", "position": "restaurant" }, { "date": "2026-02-20", "position": "driver" },
-  { "date": "2026-03-06", "position": "kitchen" }, { "date": "2026-03-13", "position": "take-out" }, { "date": "2026-03-20", "position": "restaurant" },
-  { "date": "2026-04-03", "position": "driver" }, { "date": "2026-04-10", "position": "kitchen" }, { "date": "2026-04-17", "position": "take-out" },
-  { "date": "2026-05-01", "position": "restaurant" }, { "date": "2026-05-08", "position": "driver" }, { "date": "2026-05-15", "position": "kitchen" },
-  { "date": "2026-06-05", "position": "take-out" }, { "date": "2026-06-12", "position": "restaurant" }, { "date": "2026-06-19", "position": "driver" },
-  { "date": "2026-07-03", "position": "kitchen" }, { "date": "2026-07-10", "position": "take-out" }, { "date": "2026-07-17", "position": "restaurant" },
-  { "date": "2026-08-07", "position": "driver" }, { "date": "2026-08-14", "position": "kitchen" }, { "date": "2026-08-21", "position": "take-out" },
-  { "date": "2026-09-04", "position": "restaurant" }, { "date": "2026-09-11", "position": "driver" }, { "date": "2026-09-18", "position": "kitchen" },
-  { "date": "2026-10-02", "position": "take-out" }, { "date": "2026-10-09", "position": "restaurant" }, { "date": "2026-10-16", "position": "driver" },
-  { "date": "2026-11-06", "position": "kitchen" }, { "date": "2026-11-13", "position": "take-out" }, { "date": "2026-11-20", "position": "restaurant" },
-  { "date": "2026-12-04", "position": "driver" }, { "date": "2026-12-11", "position": "kitchen" }, { "date": "2026-12-18", "position": "take-out" },
-  { "date": "2026-01-23", "position": "restaurant" }, { "date": "2026-02-27", "position": "driver" }, { "date": "2026-03-27", "position": "kitchen" },
-  { "date": "2026-04-24", "position": "take-out" }, { "date": "2026-05-22", "position": "restaurant" }, { "date": "2026-06-26", "position": "driver" },
-  { "date": "2026-07-24", "position": "kitchen" }, { "date": "2026-08-28", "position": "take-out" }, { "date": "2026-09-25", "position": "restaurant" },
-  { "date": "2026-10-23", "position": "driver" }, { "date": "2026-11-27", "position": "kitchen" }, { "date": "2026-12-25", "position": "take-out" },
-  { "date": "2026-01-30", "position": "restaurant" }, { "date": "2026-02-20", "position": "driver" }, { "date": "2026-03-20", "position": "kitchen" },
-  { "date": "2026-04-17", "position": "take-out" }, { "date": "2026-05-15", "position": "restaurant" }, { "date": "2026-06-19", "position": "driver" },
-  { "date": "2026-07-17", "position": "kitchen" }, { "date": "2026-08-21", "position": "take-out" }, { "date": "2026-09-18", "position": "restaurant" },
-  { "date": "2026-10-16", "position": "driver" }, { "date": "2026-11-20", "position": "kitchen" }, { "date": "2026-12-18", "position": "take-out" }
-];
 
 function WeekSelector({ selectedMonth, setSelectedMonth, selectedWeek, setSelectedWeek, weekOptions }) {
   return (
@@ -85,10 +13,16 @@ function WeekSelector({ selectedMonth, setSelectedMonth, selectedWeek, setSelect
       <label>
         Month:&nbsp;
         <input
-          type="month"
-          value={selectedMonth}
-          onChange={e => setSelectedMonth(e.target.value)}
-        />
+  type="month"
+  value={selectedMonth}
+  onChange={e => {
+    setSelectedMonth(e.target.value);
+    // Jump to first week of selected month
+    const [year, month] = e.target.value.split('-').map(Number);
+    const idx = weekOptions.findIndex(week => week[0].date.startsWith(`${year}-${String(month).padStart(2, '0')}`));
+    if (idx !== -1) setSelectedWeek(idx);
+  }}
+/>
       </label>
       <label>
         Week:&nbsp;
@@ -96,20 +30,49 @@ function WeekSelector({ selectedMonth, setSelectedMonth, selectedWeek, setSelect
           value={selectedWeek}
           onChange={e => setSelectedWeek(Number(e.target.value))}
         >
-          {weekOptions.map((week, idx) => (
-            <option key={idx} value={idx}>
-              Week {idx + 1}: {week.map(d => d.date.slice(5)).join(' - ')}
-            </option>
-          ))}
+          {weekOptions.map((week, idx) => {
+            // ISO week number calculation
+            function getISOWeek(dateStr) {
+              const date = new Date(dateStr);
+              date.setHours(0, 0, 0, 0);
+              date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
+              const week1 = new Date(date.getFullYear(), 0, 4);
+              return 1 + Math.round(((date - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+            }
+            function formatDMY(dateStr) {
+              const d = new Date(dateStr);
+              const dd = String(d.getDate()).padStart(2, '0');
+              const mm = String(d.getMonth() + 1).padStart(2, '0');
+              const yyyy = d.getFullYear();
+              return `${dd}-${mm}-${yyyy}`;
+            }
+            const weekNr = getISOWeek(week[0].date);
+            const monday = formatDMY(week[0].date);
+            const sunday = formatDMY(week[6].date);
+            return (
+              <option key={idx} value={idx}>
+                Week {weekNr}: Monday {monday} - Sunday {sunday}
+              </option>
+            );
+          })}
         </select>
       </label>
     </div>
   );
 }
 
-function DaysBar({ weekDays, users, freeShifts, currentUser, onDayClick }) {
+
+function DaysBar({ weekDays, users, freeShifts, currentUser, onDayClick, onPrevWeek, onNextWeek, prevDisabled, nextDisabled }) {
   return (
-    <div style={{ display: 'flex', gap: '10px', margin: '40px 0' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '40px 0' }}>
+      <button
+        onClick={onPrevWeek}
+        disabled={prevDisabled}
+        style={{ fontSize: '2rem', background: 'none', border: 'none', cursor: prevDisabled ? 'not-allowed' : 'pointer', color: prevDisabled ? '#ccc' : '#333', marginRight: '10px' }}
+        aria-label="Previous Week"
+      >
+        &#8592;
+      </button>
       {weekDays.map(day => {
         const takenShifts = [];
         let userShift = null;
@@ -139,18 +102,7 @@ function DaysBar({ weekDays, users, freeShifts, currentUser, onDayClick }) {
         return (
           <div
             key={day.date}
-            style={{
-              flex: 1,
-              background: '#e0e0e0',
-              padding: '30px 10px',
-              textAlign: 'center',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              fontSize: '2rem',
-              minHeight: '120px',
-              position: 'relative',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.07)'
-            }}
+            className="weekday-square"
             onClick={() => onDayClick(day)}
           >
             <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>
@@ -221,6 +173,14 @@ function DaysBar({ weekDays, users, freeShifts, currentUser, onDayClick }) {
           </div>
         );
       })}
+      <button
+        onClick={onNextWeek}
+        disabled={nextDisabled}
+        style={{ fontSize: '2rem', background: 'none', border: 'none', cursor: nextDisabled ? 'not-allowed' : 'pointer', color: nextDisabled ? '#ccc' : '#333', marginLeft: '10px' }}
+        aria-label="Next Week"
+      >
+        &#8594;
+      </button>
     </div>
   );
 }
@@ -251,7 +211,7 @@ function DayPopup({ day, users, freeShifts, onClose, onFreeShiftClick }) {
           zIndex: 1999
         }}
         onClick={onClose}
-      />
+      ></div>
       <div
         style={{
           position: 'fixed',
@@ -310,7 +270,7 @@ function FreeShiftPopup({ day, shift, onClose, onTakeShift }) {
           zIndex: 2999
         }}
         onClick={onClose}
-      />
+      ></div>
       <div
         style={{
           position: 'fixed',
@@ -348,27 +308,38 @@ export default function RosterPage() {
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
-  const [users, setUsers] = useState(initialUsers);
-  const [freeShifts, setFreeShifts] = useState(initialFreeShifts);
-  const [selectedDay, setSelectedDay] = useState(null);
-  const [selectedFreeShift, setSelectedFreeShift] = useState(null);
+  const [users, setUsers] = useState([]);
+  // ...existing code...
 
   // Simulate current user (replace with your auth logic)
-  const currentUser = "test";
+  const currentUser = "test"; // TODO: Replace with real auth
 
   // Week selector state
-  const today = new Date();
-  const defaultMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
-  const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
-  const [selectedWeek, setSelectedWeek] = useState(0);
-
-  // Calculate week options for the selected month
-  const mondays = getMondays(
-    Number(selectedMonth.split('-')[0]),
-    Number(selectedMonth.split('-')[1]) - 1
-  );
-  const weekOptions = mondays.map(monday => getWeekDates(monday));
-  const weekDays = weekOptions[selectedWeek] || [];
+ const startDate = new Date(2025, 6, 1); // July 1, 2025
+ const endDate = new Date(2026, 11, 31); // December 31, 2026
+ const allMondays = getAllMondaysInRange(startDate, endDate);
+function getAllMondaysInRange(start, end) {
+  const mondays = [];
+  let d = new Date(start);
+  d.setDate(d.getDate() + ((1 - d.getDay() + 7) % 7)); // Move to first Monday
+  while (d <= end) {
+    mondays.push(new Date(d));
+    d.setDate(d.getDate() + 7);
+  }
+  return mondays;
+}
+     const [freeShifts, setFreeShifts] = useState([]);
+     const [selectedDay, setSelectedDay] = useState(null);
+     const [selectedFreeShift, setSelectedFreeShift] = useState(null);
+const weekOptions = allMondays.map(monday => getWeekDates(monday));
+const today = new Date();
+const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+// Find the week containing today
+const initialWeekIdx = weekOptions.findIndex(week => week.some(day => day.date === todayStr));
+const [selectedWeek, setSelectedWeek] = useState(initialWeekIdx !== -1 ? initialWeekIdx : 0);
+const weekDays = weekOptions[selectedWeek] || [];
+const defaultMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -376,6 +347,28 @@ export default function RosterPage() {
       navigate('/login');
     }
   }, [isLoggedIn, navigate]);
+
+  // Fetch users and shifts from backend
+  useEffect(() => {
+    // Fetch users and shifts, then combine
+    Promise.all([
+      fetch('http://localhost:4000/api/users').then(res => res.json()),
+      fetch('http://localhost:4000/api/shifts').then(res => res.json())
+    ]).then(([usersData, shiftsData]) => {
+      // For each user, add datesWorking from shifts
+      const usersWithShifts = usersData.map(u => ({
+        ...u,
+        datesWorking: shiftsData
+          .filter(s => s.user_id === u.id && s.free === 0)
+          .map(s => ({ date: s.date, position: s.position }))
+      }));
+      setUsers(usersWithShifts);
+      setFreeShifts(shiftsData.filter(s => s.free === 1));
+    }).catch(() => {
+      setUsers([]);
+      setFreeShifts([]);
+    });
+  }, []);
 
   if (!isLoggedIn) {
     return null;
@@ -385,55 +378,55 @@ export default function RosterPage() {
     setSelectedFreeShift({ day, shift });
   };
 
-  const handleTakeShift = (day, shift) => {
-    // Check if current user is already working that day
+  const handleTakeShift = async (day, shift) => {
+    // Find current user in users list
     const user = users.find(u => u.username === currentUser);
-    const alreadyWorking = user && user.datesWorking.some(d => d.date === day.date);
-
-    if (alreadyWorking) {
+    if (!user) {
+      alert('User not found.');
+      setSelectedFreeShift(null);
+      return;
+    }
+    // Check if already working that day
+    // Get all shifts for this user
+    const userShifts = users
+      .filter(u => u.username === currentUser)
+      .flatMap(u => u.datesWorking || []);
+    if (userShifts.some(d => d.date === day.date)) {
       alert(`You are already working on ${day.label} (${day.date}). You cannot take another shift that day.`);
       setSelectedFreeShift(null);
       return;
     }
-
-    setUsers(prevUsers => {
-      let foundCurrentUser = false;
-      const updatedUsers = prevUsers.map(user => {
-        // Add the shift to the current user's datesWorking
-        if (user.username === currentUser) {
-          foundCurrentUser = true;
-          return {
-            ...user,
-            datesWorking: [
-              ...(user.datesWorking || []),
-              { date: day.date, position: shift.position }
-            ]
-          };
-        }
-        return user;
+    // Find the shift id from freeShifts
+    const shiftObj = freeShifts.find(s => s.date === day.date && s.position === shift.position);
+    if (!shiftObj) {
+      alert('Shift not found.');
+      setSelectedFreeShift(null);
+      return;
+    }
+    // Call API to take shift
+    try {
+      await fetch(`http://localhost:4000/api/shifts/${shiftObj.id}/take`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.id })
       });
-
-      // If current user not found, add them
-      if (!foundCurrentUser) {
-        updatedUsers.push({
-          id: prevUsers.length + 1,
-          username: currentUser,
-          password: "",
-          datesFree: [],
-          datesWorking: [{ date: day.date, position: shift.position }]
-        });
-      }
-
-      return updatedUsers;
-    });
-
-    // Remove the free shift from the freeShifts array
-    setFreeShifts(prevShifts =>
-      prevShifts.filter(
-        s => !(s.date === day.date && s.position === shift.position)
-      )
-    );
-
+      // Refetch users and shifts, then combine
+      Promise.all([
+        fetch('http://localhost:4000/api/users').then(res => res.json()),
+        fetch('http://localhost:4000/api/shifts').then(res => res.json())
+      ]).then(([usersData, shiftsData]) => {
+        const usersWithShifts = usersData.map(u => ({
+          ...u,
+          datesWorking: shiftsData
+            .filter(s => s.user_id === u.id && s.free === 0)
+            .map(s => ({ date: s.date, position: s.position }))
+        }));
+        setUsers(usersWithShifts);
+        setFreeShifts(shiftsData.filter(s => s.free === 1));
+      });
+    } catch (err) {
+      alert('Error taking shift.');
+    }
     setSelectedFreeShift(null);
     setSelectedDay(null);
   };
@@ -454,6 +447,10 @@ export default function RosterPage() {
         freeShifts={freeShifts}
         currentUser={currentUser}
         onDayClick={setSelectedDay}
+        onPrevWeek={() => setSelectedWeek(selectedWeek - 1)}
+        onNextWeek={() => setSelectedWeek(selectedWeek + 1)}
+        prevDisabled={selectedWeek === 0}
+        nextDisabled={selectedWeek === weekOptions.length - 1}
       />
       {selectedDay &&
         <DayPopup
@@ -473,5 +470,5 @@ export default function RosterPage() {
         />
       }
     </div>
-  );
-}
+    );
+  }
