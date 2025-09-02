@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import users from '../data/users.json'; // Import the JSON file
 import '../css/LoginPage.css';
 
 function LoginPage() {
@@ -10,24 +9,31 @@ function LoginPage() {
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!username || !password) {
       setError('Username and password are required.');
       return;
     }
-
-    // Use the imported JSON data
-    const user = users.find(
-      (user) => user.username === username && user.password === password
-    );
-
-    if (user) {
-      login(); // Update the global login state
-      navigate('/roster'); // Redirect to the Roster page
-    } else {
-      setError('Invalid username or password.');
+    setLoading(true);
+    try {
+      const res = await fetch('http://localhost:4000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        login(result.user); // Store user object in context
+        navigate('/roster');
+      } else {
+        setError(result.error || 'Invalid username or password.');
+      }
+    } catch (err) {
+      setError('Error connecting to server.');
     }
+    setLoading(false);
   };
 
   return (

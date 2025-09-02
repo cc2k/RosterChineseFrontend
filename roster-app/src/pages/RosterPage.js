@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import initialUsers from '../data/users.json';
 import '../css/RosterPage.css';
 import { getWeekDates, getMondays, initialFreeShifts } from '../components/DateSelector';
 
@@ -80,7 +79,8 @@ function DaysBar({ weekDays, users, freeShifts, currentUser, onDayClick, onPrevW
         users.forEach(u => {
           if (u.datesWorking) {
             u.datesWorking.forEach(d => {
-              if (d.date === day.date) {
+              // Compare only the date part of ISO string
+              if (d.date && d.date.slice(0, 10) === day.date) {
                 if (u.username === currentUser) {
                   userShift = d.position;
                 } else {
@@ -305,14 +305,14 @@ function FreeShiftPopup({ day, shift, onClose, onTakeShift }) {
 }
 
 export default function RosterPage() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user } = useAuth();
   const navigate = useNavigate();
 
   const [users, setUsers] = useState([]);
   // ...existing code...
 
-  // Simulate current user (replace with your auth logic)
-  const currentUser = "test"; // TODO: Replace with real auth
+  // Use logged-in user from context
+  const currentUser = user ? user.username : null;
 
   // Week selector state
  const startDate = new Date(2025, 6, 1); // July 1, 2025
@@ -348,22 +348,39 @@ const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
     }
   }, [isLoggedIn, navigate]);
 
-  // Fetch users and shifts from backend
+  // Fetch users, shifts, assignments, unavailability, and roles from backend
   useEffect(() => {
-    // Fetch users and shifts, then combine
     Promise.all([
       fetch('http://localhost:4000/api/users').then(res => res.json()),
-      fetch('http://localhost:4000/api/shifts').then(res => res.json())
-    ]).then(([usersData, shiftsData]) => {
-      // For each user, add datesWorking from shifts
+      fetch('http://localhost:4000/api/shift_assignments').then(res => res.json()),
+      fetch('http://localhost:4000/api/user_unavailability').then(res => res.json()),
+      fetch('http://localhost:4000/api/roles').then(res => res.json()),
+      fetch('http://localhost:4000/api/free_shifts').then(res => res.json())
+    ]).then(([usersData, assignmentsData, unavailData, rolesData, freeShiftsData]) => {
+      // Map role_id to role_name
+      const roleIdToName = Object.fromEntries(rolesData.map(r => [r.role_id, r.role_name]));
+      // For each user, add datesWorking from assignments
       const usersWithShifts = usersData.map(u => ({
         ...u,
-        datesWorking: shiftsData
-          .filter(s => s.user_id === u.id && s.free === 0)
-          .map(s => ({ date: s.date, position: s.position }))
+        datesWorking: assignmentsData
+          .filter(a => a.user_id === u.user_id)
+          .map(a => {
+            // You may need to fetch shift info for assignments if needed
+            return { date: a.shift_date ? a.shift_date.slice(0,10) : null, position: roleIdToName[a.role_id] };
+          })
+          .filter(Boolean),
+        datesFree: unavailData
+          .filter(ua => ua.user_id === u.user_id)
+          .map(ua => ({ date: ua.unavailable_date, reason: ua.reason }))
       }));
       setUsers(usersWithShifts);
-      setFreeShifts(shiftsData.filter(s => s.free === 1));
+      setFreeShifts(
+        freeShiftsData.map(s => ({
+          id: s.shift_id,
+          date: s.shift_date ? s.shift_date.slice(0,10) : null,
+          position: roleIdToName[s.role_id]
+        }))
+      );
     }).catch(() => {
       setUsers([]);
       setFreeShifts([]);
@@ -403,26 +420,42 @@ const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
       setSelectedFreeShift(null);
       return;
     }
-    // Call API to take shift
+    // Call API to take shift (create assignment)
     try {
-      await fetch(`http://localhost:4000/api/shifts/${shiftObj.id}/take`, {
-        method: 'PUT',
+      await fetch('http://localhost:4000/api/shift_assignments', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user.id })
+        body: JSON.stringify({ shift_id: shiftObj.id, user_id: user.user_id })
       });
-      // Refetch users and shifts, then combine
+      // Refetch all data
       Promise.all([
         fetch('http://localhost:4000/api/users').then(res => res.json()),
-        fetch('http://localhost:4000/api/shifts').then(res => res.json())
-      ]).then(([usersData, shiftsData]) => {
+        fetch('http://localhost:4000/api/shift_assignments').then(res => res.json()),
+        fetch('http://localhost:4000/api/user_unavailability').then(res => res.json()),
+        fetch('http://localhost:4000/api/roles').then(res => res.json()),
+        fetch('http://localhost:4000/api/free_shifts').then(res => res.json())
+      ]).then(([usersData, assignmentsData, unavailData, rolesData, freeShiftsData]) => {
+        const roleIdToName = Object.fromEntries(rolesData.map(r => [r.role_id, r.role_name]));
         const usersWithShifts = usersData.map(u => ({
           ...u,
-          datesWorking: shiftsData
-            .filter(s => s.user_id === u.id && s.free === 0)
-            .map(s => ({ date: s.date, position: s.position }))
+          datesWorking: assignmentsData
+            .filter(a => a.user_id === u.user_id)
+            .map(a => {
+              return { date: a.shift_date ? a.shift_date.slice(0,10) : null, position: roleIdToName[a.role_id] };
+            })
+            .filter(Boolean),
+          datesFree: unavailData
+            .filter(ua => ua.user_id === u.user_id)
+            .map(ua => ({ date: ua.unavailable_date, reason: ua.reason }))
         }));
         setUsers(usersWithShifts);
-        setFreeShifts(shiftsData.filter(s => s.free === 1));
+        setFreeShifts(
+          freeShiftsData.map(s => ({
+            id: s.shift_id,
+            date: s.shift_date ? s.shift_date.slice(0,10) : null,
+            position: roleIdToName[s.role_id]
+          }))
+        );
       });
     } catch (err) {
       alert('Error taking shift.');
