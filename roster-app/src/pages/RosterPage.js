@@ -360,13 +360,18 @@ const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
       // Map role_id to role_name
       const roleIdToName = Object.fromEntries(rolesData.map(r => [r.role_id, r.role_name]));
       // For each user, add datesWorking from assignments
+      const allShifts = [...freeShiftsData, ...assignmentsData.map(a => ({
+        shift_id: a.shift_id,
+        shift_date: a.shift_date,
+        role_id: a.role_id
+      }))];
       const usersWithShifts = usersData.map(u => ({
         ...u,
         datesWorking: assignmentsData
           .filter(a => a.user_id === u.user_id)
           .map(a => {
-            // You may need to fetch shift info for assignments if needed
-            return { date: a.shift_date ? a.shift_date.slice(0,10) : null, position: roleIdToName[a.role_id] };
+            const shift = allShifts.find(s => s.shift_id === a.shift_id);
+            return shift ? { date: shift.shift_date ? shift.shift_date.slice(0,10) : null, position: roleIdToName[shift.role_id] } : null;
           })
           .filter(Boolean),
         datesFree: unavailData

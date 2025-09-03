@@ -1,5 +1,4 @@
 
-
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -43,6 +42,58 @@ app.get('/api/test-mysql', (req, res) => {
   });
 });
 
+// Change password endpoint
+app.post('/api/change_password', (req, res) => {
+  const { user_id, currentPassword, newPassword } = req.body;
+  if (!user_id || !currentPassword || !newPassword) {
+    return res.status(400).json({ success: false, error: 'Missing fields.' });
+  }
+  // Get current password hash from DB
+  pool.query('SELECT password_hash FROM users WHERE user_id = ?', [user_id], (err, results) => {
+    if (err) {
+      return res.status(500).json({ success: false, error: 'Database error.' });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, error: 'User not found.' });
+    }
+    const user = results[0];
+    if (user.password_hash !== currentPassword) {
+      return res.status(401).json({ success: false, error: 'Current password is incorrect.' });
+    }
+    // Update password
+    pool.query('UPDATE users SET password_hash = ? WHERE user_id = ?', [newPassword, user_id], (updateErr) => {
+      if (updateErr) {
+        return res.status(500).json({ success: false, error: 'Failed to update password.' });
+      }
+      res.json({ success: true });
+    });
+  });
+});
+
+// Get user details by ID (for profile page)
+app.get('/api/users/:id', (req, res) => {
+  const userId = req.params.id;
+  const sql = `
+    SELECT u.user_id, u.username, u.email, u.telephone, GROUP_CONCAT(r.role_name) AS roles
+    FROM users u
+    LEFT JOIN user_roles ur ON u.user_id = ur.user_id
+    LEFT JOIN roles r ON ur.role_id = r.role_id
+    WHERE u.user_id = ?
+    GROUP BY u.user_id, u.username, u.email, u.telephone
+  `;
+  pool.query(sql, [userId], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const user = results[0];
+    user.roles = user.roles ? user.roles.split(',') : [];
+    res.json(user);
+  });
+});
+
 // Get all roles
 app.get('/api/roles', (req, res) => {
   pool.query('SELECT role_id, role_name FROM roles ORDER BY role_id', (err, results) => {
@@ -69,6 +120,18 @@ app.get('/api/users', (req, res) => {
     res.json(results);
   });
 });
+
+// Role-based middleware
+function requireAdmin(req, res, next) {
+  // For demo: get role from request header (in production, use JWT/session)
+  const role = req.headers['x-user-role'];
+  if (role === 'admin') {
+    return next();
+  } else {
+    return res.status(403).json({ error: 'Forbidden: Admins only.' });
+  }
+}
+
 
 // Add a user
 app.post('/api/users', (req, res) => {
@@ -191,7 +254,15 @@ app.post('/api/login', (req, res) => {
   if (!username || !password) {
     return res.status(400).json({ success: false, error: 'Username and password required.' });
   }
-  pool.query('SELECT user_id, username, password_hash FROM users WHERE username = ?', [username], (err, results) => {
+  const sql = `
+    SELECT u.user_id, u.username, u.password_hash, r.role_name
+    FROM users u
+    LEFT JOIN user_roles ur ON u.user_id = ur.user_id
+    LEFT JOIN roles r ON ur.role_id = r.role_id
+    WHERE u.username = ?
+    LIMIT 1
+  `;
+  pool.query(sql, [username], (err, results) => {
     if (err) {
       return res.status(500).json({ success: false, error: 'Database error.' });
     }
@@ -200,7 +271,7 @@ app.post('/api/login', (req, res) => {
     }
     const user = results[0];
     if (user.password_hash === password) {
-      return res.json({ success: true, user: { user_id: user.user_id, username: user.username } });
+      return res.json({ success: true, user: { user_id: user.user_id, username: user.username, role: user.role_name } });
     } else {
       return res.status(401).json({ success: false, error: 'Invalid username or password.' });
     }

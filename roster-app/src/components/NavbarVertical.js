@@ -35,6 +35,9 @@ function NavbarVertical() {
           <li>
             <Link to="/roster" onClick={toggleMenu}>Roster</Link>
           </li>
+              <li>
+                <Link to="/profile" onClick={toggleMenu}>Profile</Link>
+              </li>
         </ul>
       </nav>
     </>

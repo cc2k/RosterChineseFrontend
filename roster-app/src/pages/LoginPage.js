@@ -7,7 +7,7 @@ function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, role } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +25,7 @@ function LoginPage() {
       });
       const result = await res.json();
       if (res.ok && result.success) {
-        login(result.user); // Store user object in context
+        login(result.user); // Store user object and role in context
         navigate('/roster');
       } else {
         setError(result.error || 'Invalid username or password.');
@@ -37,10 +37,11 @@ function LoginPage() {
   };
 
   return (
-      <div className="login-container">
+    <div className="login-container">
       <div className="login-box">
         <h2>Login</h2>
         {error && <p className="error-message">{error}</p>}
+        {role && <p className="role-message">Logged in as: <strong>{role}</strong></p>}
         <div className="input-group">
           <label htmlFor="username">Username</label>
           <input

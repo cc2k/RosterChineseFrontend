@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import RosterPage from './pages/RosterPage';
 import WelcomePage from './pages/WelcomePage'; 
+import ProfilePage from './pages/ProfilePage';
 import NavbarVertical from './components/NavbarVertical';
 import NavbarHorizontal from './components/NavbarHorizontal';
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/roster" element={<RosterPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </>
   );
