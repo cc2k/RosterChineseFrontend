@@ -1,0 +1,63 @@
+.profile-container {
+  max-width: 500px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 32px;
+}
+.profile-info p {
+  font-size: 1.1em;
+  margin: 12px 0;
+}
+.profile-info strong {
+  color: #2c3e50;
+}
+.profile-password-box {
+  margin-top: 36px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.profile-password-box form {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 16px;
+  align-items: start;
+  margin-top: 12px;
+  width: 100%;
+}
+.profile-password-box label {
+  font-weight: 500;
+  margin-bottom: 4px;
+  display: block;
+}
+.profile-password-box input[type="password"] {
+  width: 100%;
+  max-width: 220px;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+  box-sizing: border-box;
+  margin-bottom: 4px;
+  display: block;
+}
+.profile-password-box button[type="submit"] {
+  padding: 7px 18px;
+  background: #2c3e50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1em;
+  cursor: pointer;
+  margin-top: 8px;
+  max-width: 220px;
+}
+.password-msg {
+  margin-top: 12px;
+  color: #c0392b;
+  font-weight: 500;
+}

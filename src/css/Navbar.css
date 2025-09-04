@@ -1,0 +1,124 @@
+/* Navbar container */
+.navbar-vertical {
+  position: fixed;
+  top: 65;
+  left: -100%;
+  height: 100%;
+  width: 250px;
+  background-color: #ffffff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 999;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 0 10px 10px 0;
+  overflow: hidden;
+}
+
+/* Show the navbar when open */
+.navbar-vertical.open {
+  left: 0%;
+  transform: translateX(0);
+}
+
+/* Hamburger icon (inside navbar) */
+.hamburger-vertical {
+top: 10px;
+left: 10px;
+position: absolute;
+  font-size: 24px;
+  width: 25px;
+  cursor: pointer;
+  color: #007bff;
+  padding: 10px;
+  }
+
+/* Change hamburger to red cross when navbar is open */
+.navbar-vertical.open .hamburger-vertical {
+  color: #ff0000; /* Red color for the cross */
+  transform: rotate(45deg); /* Rotate to form a cross */
+}
+
+/* Navigation links container */
+.nav-vertical-links {
+  list-style: none;
+  padding: 0;
+  margin: 50px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* Individual link styles */
+.nav-vertical-links li a {
+  text-decoration: none;
+  color: #333333;
+  font-size: 18px;
+  padding: 10px 15px;
+  border-radius: 5px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-family: 'Arial', sans-serif;
+}
+
+.nav-vertical-links li a:hover {
+  background-color: #f0f0f0;
+  color: #007bff;
+}
+
+.nav-vertical-links li a.active {
+  background-color: #007bff;
+  color: #ffffff;
+}
+
+
+
+
+/* Navbar styles for horizontal layout */
+
+.navbar-horizontal {
+  display: flex;
+  justify-content: space-between; /* Space between left and right elements */
+  align-items: center;
+  padding: 20px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+  position: relative; /* Needed for absolute centering of the title */
+}
+
+.navbar-horizontal-content {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.navbar-horizontal-title {
+  position: absolute; /* Absolutely center the title */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.navbar-horizontal-link {
+  background: none;
+  width: auto; /* Allow the link to take its natural width */
+  margin-left: auto; /* Push the link to the right */
+  border: none;
+  color: #007bff;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none; /* Remove default underline */
+  padding: 0;
+}
+
+.navbar-horizontal-link:hover {
+  color: #0056b3;
+  text-decoration: none; /* Ensure no underline is added */
+}
+
+.navbar-horizontal-link:focus {
+  outline: none; /* Remove focus outline */
+}

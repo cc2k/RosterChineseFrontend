@@ -1,0 +1,7 @@
+frontend
+
+- shifting when selecting different week (rosterPage)
+- datum days not YYY-MM-DD 
+
+
+backend

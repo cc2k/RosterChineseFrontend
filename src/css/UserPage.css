@@ -1,0 +1,78 @@
+/* Popup overlay and box styles */
+.user-popup-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.2);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.user-popup {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+  padding: 2rem;
+  min-width: 320px;
+  max-width: 90vw;
+}
+.user-popup h3 {
+  margin-top: 0;
+  color: #1976d2;
+}
+.user-popup label {
+  display: block;
+  margin-bottom: 1rem;
+  color: #333;
+}
+.user-popup input {
+  width: 100%;
+  padding: 6px 10px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.user-popup button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background: #1976d2;
+  color: #fff;
+  margin-top: 10px;
+  cursor: pointer;
+}
+.user-popup button[style*='background: #d32f2f'] {
+  background: #d32f2f;
+}
+/* UserPage.css */
+.userpage-container {
+  padding: 2rem;
+  background: #f9f9f9;
+  min-height: 80vh;
+}
+.userpage-title {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #007bff;
+}
+.userpage-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.userpage-table th, .userpage-table td {
+  border: 1px solid #e0e0e0;
+  padding: 10px 14px;
+  text-align: left;
+}
+.userpage-table th {
+  background: #f0f8ff;
+  color: #333;
+}
+.userpage-table tr:nth-child(even) {
+  background: #f6f6f6;
+}
+.userpage-table tr:hover {
+  background: #e3f2fd;
+}
