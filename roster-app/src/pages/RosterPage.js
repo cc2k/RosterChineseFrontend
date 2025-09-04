@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../css/RosterPage.css';
-import { getWeekDates, getMondays, initialFreeShifts } from '../components/DateSelector';
+import { getWeekDates } from '../components/DateSelector';
 
 
 
@@ -351,11 +351,11 @@ const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
   // Fetch users, shifts, assignments, unavailability, and roles from backend
   useEffect(() => {
     Promise.all([
-      fetch('http://localhost:4000/api/users').then(res => res.json()),
-      fetch('http://localhost:4000/api/shift_assignments').then(res => res.json()),
-      fetch('http://localhost:4000/api/user_unavailability').then(res => res.json()),
-      fetch('http://localhost:4000/api/roles').then(res => res.json()),
-      fetch('http://localhost:4000/api/free_shifts').then(res => res.json())
+      fetch('/api/users').then(res => res.json()),
+      fetch('/api/shift_assignments').then(res => res.json()),
+      fetch('/api/user_unavailability').then(res => res.json()),
+      fetch('/api/roles').then(res => res.json()),
+      fetch('/api/free_shifts').then(res => res.json())
     ]).then(([usersData, assignmentsData, unavailData, rolesData, freeShiftsData]) => {
       // Map role_id to role_name
       const roleIdToName = Object.fromEntries(rolesData.map(r => [r.role_id, r.role_name]));
@@ -427,18 +427,18 @@ const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
     }
     // Call API to take shift (create assignment)
     try {
-      await fetch('http://localhost:4000/api/shift_assignments', {
+      await fetch('/api/shift_assignments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ shift_id: shiftObj.id, user_id: user.user_id })
       });
       // Refetch all data
       Promise.all([
-        fetch('http://localhost:4000/api/users').then(res => res.json()),
-        fetch('http://localhost:4000/api/shift_assignments').then(res => res.json()),
-        fetch('http://localhost:4000/api/user_unavailability').then(res => res.json()),
-        fetch('http://localhost:4000/api/roles').then(res => res.json()),
-        fetch('http://localhost:4000/api/free_shifts').then(res => res.json())
+        fetch('/api/users').then(res => res.json()),
+        fetch('/api/shift_assignments').then(res => res.json()),
+        fetch('/api/user_unavailability').then(res => res.json()),
+        fetch('/api/roles').then(res => res.json()),
+        fetch('/api/free_shifts').then(res => res.json())
       ]).then(([usersData, assignmentsData, unavailData, rolesData, freeShiftsData]) => {
         const roleIdToName = Object.fromEntries(rolesData.map(r => [r.role_id, r.role_name]));
         const usersWithShifts = usersData.map(u => ({

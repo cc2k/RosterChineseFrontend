@@ -9,16 +9,14 @@ function LoginPage() {
   const [error, setError] = useState('');
   const { login, role } = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!username || !password) {
       setError('Username and password are required.');
       return;
     }
-    setLoading(true);
     try {
-      const res = await fetch('http://localhost:4000/api/login', {
+      const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -33,7 +31,6 @@ function LoginPage() {
     } catch (err) {
       setError('Error connecting to server.');
     }
-    setLoading(false);
   };
 
   return (
