@@ -41,7 +41,8 @@ const FeedbackPage = () => {
     }
     setError('');
     try {
-      const res = await fetch('/api/feedback', {
+      const apiUrl = process.env.REACT_APP_API_URL || '';
+      const res = await fetch(`${apiUrl}/api/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
