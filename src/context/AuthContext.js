@@ -1,13 +1,28 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 // Create the AuthContext
 const AuthContext = createContext();
 
 // Provide the AuthContext to the app
 export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
-  const [roles, setRoles] = useState([]);
+  // Load initial state from localStorage
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('isLoggedIn') === 'true';
+  });
+  const [user, setUser] = useState(() => {
+    const stored = localStorage.getItem('user');
+    return stored ? JSON.parse(stored) : null;
+  });
+  const [roles, setRoles] = useState(() => {
+    const stored = localStorage.getItem('roles');
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('isLoggedIn', isLoggedIn);
+    localStorage.setItem('user', user ? JSON.stringify(user) : '');
+    localStorage.setItem('roles', JSON.stringify(roles));
+  }, [isLoggedIn, user, roles]);
 
   const login = (userObj) => {
     setIsLoggedIn(true);
@@ -18,6 +33,9 @@ export const AuthProvider = ({ children }) => {
     setIsLoggedIn(false);
     setUser(null);
     setRoles([]);
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('user');
+    localStorage.removeItem('roles');
   };
 
   return (
@@ -29,5 +47,5 @@ export const AuthProvider = ({ children }) => {
 
 // Custom hook to use the AuthContext
 export function useAuth() {
-    return useContext(AuthContext);
-  }
+  return useContext(AuthContext);
+}

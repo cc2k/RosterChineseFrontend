@@ -6,6 +6,7 @@ import RosterPage from './pages/RosterPage';
 import WelcomePage from './pages/WelcomePage'; 
 import ProfilePage from './pages/ProfilePage';
 import UserPage from './pages/UserPage';
+import FeedbackPage from './pages/FeedbackPage';
 import NavbarVertical from './components/NavbarVertical';
 import NavbarHorizontal from './components/NavbarHorizontal';
 
@@ -27,6 +28,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/users" element={<UserPage />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
       </Routes>
     </>
   );

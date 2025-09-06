@@ -19,14 +19,24 @@ const ProfilePage = () => {
   useEffect(() => {
     if (user) {
       fetch(`/api/users/${user.user_id}`)
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`Server error: ${res.status}`);
+          }
+          return res.json();
+        })
         .then(data => {
+          console.log('Fetched profile data:', data); // Debug log
           setProfile(data);
           setEditUsername(data.username || '');
           setEditFirstname(data.firstname || '');
           setEditSurname(data.surname || '');
           setEditEmail(data.email || '');
           setEditTelephone(data.telephone || '');
+        })
+        .catch(err => {
+          console.error('Profile fetch error:', err);
+          setProfileMsg('Failed to load profile.');
         });
     }
   }, [user]);

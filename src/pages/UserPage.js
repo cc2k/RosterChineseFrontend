@@ -25,7 +25,7 @@ export default function UserPage() {
     }
     setCheckingAuth(false);
     if (roles.includes('admin')) {
-      fetch('http://localhost:4000/api/users')
+  fetch('/api/users')
         .then(res => res.json())
         .then(setUsers)
         .catch(() => setUsers([]));
@@ -42,7 +42,7 @@ export default function UserPage() {
   const handleAddUser = async (newUser) => {
     try {
       // Create user first
-      const userRes = await fetch('http://localhost:4000/api/users', {
+  const userRes = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -56,14 +56,14 @@ export default function UserPage() {
       const userData = await userRes.json();
       // Add roles for user
       for (const role_id of newUser.roles) {
-        await fetch('http://localhost:4000/api/user_roles', {
+  await fetch('/api/user_roles', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ user_id: userData.user_id, role_id })
         });
       }
       // Refetch users after adding
-      const res = await fetch('http://localhost:4000/api/users');
+  const res = await fetch('/api/users');
       const updatedUsers = await res.json();
       setUsers(updatedUsers);
     } catch (err) {
@@ -75,11 +75,11 @@ export default function UserPage() {
   
   const handleDeleteUser = async (userId) => {
     try {
-      await fetch(`http://localhost:4000/api/users/${userId}`, {
+  await fetch(`/api/users/${userId}`, {
         method: 'DELETE'
       });
       // Refetch users after deletion
-      const res = await fetch('http://localhost:4000/api/users');
+  const res = await fetch('/api/users');
       const updatedUsers = await res.json();
       setUsers(updatedUsers);
     } catch (err) {
