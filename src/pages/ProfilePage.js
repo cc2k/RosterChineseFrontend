@@ -17,8 +17,9 @@ const ProfilePage = () => {
   const [passwordMsg, setPasswordMsg] = useState('');
 
   useEffect(() => {
+    const API_URL = process.env.REACT_APP_API_URL;
     if (user) {
-      fetch(`/api/users/${user.user_id}`)
+      fetch(`${API_URL}/api/users/${user.user_id}`)
         .then(async res => {
           const text = await res.text();
           try {
@@ -57,7 +58,8 @@ const ProfilePage = () => {
       return;
     }
     try {
-      const res = await fetch(`/api/users/${user.user_id}`, {
+  const API_URL = process.env.REACT_APP_API_URL;
+  const res = await fetch(`${API_URL}/api/users/${user.user_id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
