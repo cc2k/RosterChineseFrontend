@@ -19,9 +19,11 @@ const ProfilePage = () => {
   useEffect(() => {
     if (user) {
       fetch(`/api/users/${user.user_id}`)
-        .then(res => {
+        .then(async res => {
           if (!res.ok) {
-            throw new Error(`Server error: ${res.status}`);
+            // Try to read the response as text for debugging
+            const text = await res.text();
+            throw new Error(`Server error: ${res.status} - ${text}`);
           }
           return res.json();
         })
@@ -36,7 +38,7 @@ const ProfilePage = () => {
         })
         .catch(err => {
           console.error('Profile fetch error:', err);
-          setProfileMsg('Failed to load profile.');
+          setProfileMsg('Failed to load profile. ' + err.message);
         });
     }
   }, [user]);
