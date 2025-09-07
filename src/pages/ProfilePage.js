@@ -20,12 +20,19 @@ const ProfilePage = () => {
     if (user) {
       fetch(`/api/users/${user.user_id}`)
         .then(async res => {
-          if (!res.ok) {
-            // Try to read the response as text for debugging
-            const text = await res.text();
-            throw new Error(`Server error: ${res.status} - ${text}`);
+          const text = await res.text();
+          try {
+            if (!res.ok) {
+              // Log the raw response text for debugging
+              console.error('Server error:', res.status, text);
+              throw new Error(`Server error: ${res.status} - ${text}`);
+            }
+            // Try to parse JSON, but log the raw text if it fails
+            return JSON.parse(text);
+          } catch (jsonErr) {
+            console.error('Failed to parse JSON:', text);
+            throw new Error(`Invalid JSON: ${text}`);
           }
-          return res.json();
         })
         .then(data => {
           console.log('Fetched profile data:', data); // Debug log
