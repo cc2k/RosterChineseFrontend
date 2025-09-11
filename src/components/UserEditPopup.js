@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import RoleSelector from './RoleSelector';
 
 export default function UserEditPopup({ user, onClose, onSave }) {
   const [form, setForm] = useState({
@@ -9,6 +10,10 @@ export default function UserEditPopup({ user, onClose, onSave }) {
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const setSelectedRoles = (roles) => {
+    setForm({ ...form, roles });
   };
 
   const handleSave = () => {
@@ -28,11 +33,13 @@ export default function UserEditPopup({ user, onClose, onSave }) {
         </label>
         <br/>
         <label>Roles:<br/>
-          <input name="roles" value={form.roles} onChange={handleChange} />
+          <RoleSelector selectedRoles={form.roles} setSelectedRoles={setSelectedRoles} />
         </label>
         <br/>
-        <button onClick={handleSave}>Save</button>
-        <button onClick={onClose} style={{ marginLeft: 8 }}>Cancel</button>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
+          <button onClick={handleSave}>Save</button>
+          <button onClick={onClose}>Cancel</button>
+        </div>
       </div>
     </div>
   );

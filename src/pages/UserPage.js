@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import UserEditPopup from '../components/UserEditPopup';
 import UserDeletePopup from '../components/UserDeletePopup';
 import AddUserPopup from '../components/AddUserPopup';
+import UserShiftsPopup from '../components/UserShiftsPopup';
 import '../css/UserPage.css';
 
 export default function UserPage() {
@@ -14,6 +15,7 @@ export default function UserPage() {
   const [editUser, setEditUser] = useState(null);
   const [deleteUser, setDeleteUser] = useState(null);
   const [addUserPopup, setAddUserPopup] = useState(false);
+  const [shiftsUser, setShiftsUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   
   console.log('UserPage roles:', roles);
@@ -113,21 +115,27 @@ export default function UserPage() {
               <td>{user.email}</td>
               <td>{user.roles || ''}</td>
               <td>
-                <span style={{ cursor: 'pointer', marginRight: 10 }} title="Edit" onClick={() => setEditUser(user)}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1976d2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
-                </span>
-                <span style={{ cursor: 'pointer' }} title="Delete" onClick={() => setDeleteUser(user)}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d32f2f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m5 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <span style={{ cursor: 'pointer', marginRight: 10 }} title="Edit Shifts" onClick={() => setShiftsUser(user)}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#43a047" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><circle cx="12" cy="16" r="2"/><path d="M12 14v2"/></svg>
+                  </span>
+                  <span style={{ cursor: 'pointer', marginRight: 10 }} title="Edit" onClick={() => setEditUser(user)}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1976d2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                  </span>
+                  <span style={{ cursor: 'pointer', marginLeft: 'auto' }} title="Delete" onClick={() => setDeleteUser(user)}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d32f2f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m5 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                  </span>
+                </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
       <button style={{ marginTop: '2rem', padding: '10px 24px', fontSize: '1.1rem', background: '#1976d2', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }} onClick={() => setAddUserPopup(true)}>Add User</button>
-      {addUserPopup && <AddUserPopup onClose={() => setAddUserPopup(false)} onAdd={handleAddUser} />}
-      {editUser && <UserEditPopup user={editUser} onClose={() => setEditUser(null)} onSave={handleSaveEdit} />}
-      {deleteUser && <UserDeletePopup user={deleteUser} onClose={() => setDeleteUser(null)} onDelete={handleDeleteUser} />}
+  {addUserPopup && <AddUserPopup onClose={() => setAddUserPopup(false)} onAdd={handleAddUser} />}
+  {editUser && <UserEditPopup user={editUser} onClose={() => setEditUser(null)} onSave={handleSaveEdit} />}
+  {deleteUser && <UserDeletePopup user={deleteUser} onClose={() => setDeleteUser(null)} onDelete={handleDeleteUser} />}
+  {shiftsUser && <UserShiftsPopup user={shiftsUser} onClose={() => setShiftsUser(null)} />}
     </div>
   );
 }

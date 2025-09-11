@@ -1,370 +1,142 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router';
 import { useAuth } from '../context/AuthContext';
 import '../css/RosterPage.css';
-import { getWeekDates, getMondays, initialFreeShifts } from '../components/DateSelector';
+import { getWeekDates } from '../components/DateSelector';
+import WeekSelector from '../components/WeekSelector';
+import DaysBar from '../components/DaysBar';
+import DayPopup from '../components/DayPopup';
+import FreeShiftPopup from '../components/FreeShiftPopup';
+import { useUserSettings } from '../context/UserSettingsContext';
+import { SHIFT_COLOR_DEFINITIONS } from '../components/shiftColors';
+import { useToast } from '../components/ToastContext';
 
-
-
-function WeekSelector({ selectedMonth, setSelectedMonth, selectedWeek, setSelectedWeek, weekOptions }) {
+function ShiftColorLegendPopup({ open, onClose }) {
+  if (!open) return null;
   return (
-    <div style={{ marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '20px' }}>
-      <label>
-        Month:&nbsp;
-        <input
-  type="month"
-  value={selectedMonth}
-  onChange={e => {
-    setSelectedMonth(e.target.value);
-    // Jump to first week of selected month
-    const [year, month] = e.target.value.split('-').map(Number);
-    const idx = weekOptions.findIndex(week => week[0].date.startsWith(`${year}-${String(month).padStart(2, '0')}`));
-    if (idx !== -1) setSelectedWeek(idx);
-  }}
-/>
-      </label>
-      <label>
-        Week:&nbsp;
-        <select
-          value={selectedWeek}
-          onChange={e => setSelectedWeek(Number(e.target.value))}
-        >
-          {weekOptions.map((week, idx) => {
-            // ISO week number calculation
-            function getISOWeek(dateStr) {
-              const date = new Date(dateStr);
-              date.setHours(0, 0, 0, 0);
-              date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
-              const week1 = new Date(date.getFullYear(), 0, 4);
-              return 1 + Math.round(((date - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
-            }
-            function formatDMY(dateStr) {
-              const d = new Date(dateStr);
-              const dd = String(d.getDate()).padStart(2, '0');
-              const mm = String(d.getMonth() + 1).padStart(2, '0');
-              const yyyy = d.getFullYear();
-              return `${dd}-${mm}-${yyyy}`;
-            }
-            const weekNr = getISOWeek(week[0].date);
-            const monday = formatDMY(week[0].date);
-            const sunday = formatDMY(week[6].date);
-            return (
-              <option key={idx} value={idx}>
-                Week {weekNr}: Monday {monday} - Sunday {sunday}
-              </option>
-            );
-          })}
-        </select>
-      </label>
+    <div style={{
+      position: 'fixed',
+      top: 80,
+      right: 40,
+      background: '#fff',
+      border: '1px solid #ccc',
+      borderRadius: 8,
+      boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+      padding: 16,
+      zIndex: 2000,
+      minWidth: 220
+    }}>
+      <strong>Shift Color Legend</strong>
+      <ul style={{ listStyle: 'none', padding: 0, margin: '12px 0 0 0' }}>
+        {SHIFT_COLOR_DEFINITIONS.map(def => (
+          <li key={def.key} style={{ marginBottom: 6 }}>
+            <span style={{ display: 'inline-block', width: 16, height: 16, background: def.background, color: def.color, borderRadius: 3, marginRight: 8, border: '1px solid #ccc', verticalAlign: 'middle' }}></span>
+            {def.description}
+          </li>
+        ))}
+      </ul>
+      <button style={{ marginTop: 12, float: 'right' }} onClick={onClose}>Close</button>
     </div>
   );
 }
-
-
-function DaysBar({ weekDays, users, freeShifts, currentUser, onDayClick, onPrevWeek, onNextWeek, prevDisabled, nextDisabled }) {
-  return (
-    <>
-      <div className="week-arrows-top">
-        <button
-          className="week-arrow left"
-          onClick={onPrevWeek}
-          disabled={prevDisabled}
-          aria-label="Previous Week"
-        >
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <polyline points="20,8 12,16 20,24" stroke="#007bff" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <span style={{ marginLeft: 6, fontSize: '1.1rem', color: '#007bff', verticalAlign: 'middle' }}>Prev</span>
-        </button>
-        <button
-          className="week-arrow right"
-          onClick={onNextWeek}
-          disabled={nextDisabled}
-          aria-label="Next Week"
-        >
-          <span style={{ marginRight: 6, fontSize: '1.1rem', color: '#007bff', verticalAlign: 'middle' }}>Next</span>
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <polyline points="12,8 20,16 12,24" stroke="#007bff" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-      </div>
-      <div className="days-bar">
-        {weekDays.map(day => {
-          const takenShifts = [];
-          let userShift = null;
-          let userFree = false;
-          users.forEach(u => {
-            if (u.datesWorking) {
-              u.datesWorking.forEach(d => {
-                if (d.date && d.date.slice(0, 10) === day.date) {
-                  if (u.username === currentUser) {
-                    userShift = d.position;
-                  } else {
-                    takenShifts.push({ username: u.username, position: d.position });
-                  }
-                }
-              });
-            }
-            if (u.username === currentUser && u.datesFree) {
-              u.datesFree.forEach(free => {
-                if (free.date === day.date) {
-                  userFree = true;
-                }
-              });
-            }
-          });
-          const openShifts = freeShifts.filter(shift => shift.date === day.date);
-          return (
-            <div
-              key={day.date}
-              className="weekday-square"
-              onClick={() => onDayClick(day)}
-            >
-              <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>
-                {day.label}<br /><span style={{ fontSize: '1rem', fontWeight: 'normal' }}>{day.date}</span>
-              </div>
-              {userFree && (
-                <div
-                  style={{
-                    background: '#2196f3',
-                    color: '#fff',
-                    borderRadius: '6px',
-                    padding: '4px 8px',
-                    margin: '4px 0',
-                    fontSize: '1.1rem'
-                  }}
-                >
-                  You want to be free
-                </div>
-              )}
-              {userShift && (
-                <div
-                  style={{
-                    background: '#4caf50',
-                    color: '#fff',
-                    borderRadius: '6px',
-                    padding: '4px 8px',
-                    margin: '4px 0',
-                    fontSize: '1.1rem'
-                  }}
-                >
-                  {userShift} (You)
-                </div>
-              )}
-              {takenShifts.map((shift, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    background: '#ffd600',
-                    color: '#333',
-                    borderRadius: '6px',
-                    padding: '4px 8px',
-                    margin: '4px 0',
-                    fontSize: '1.1rem'
-                  }}
-                >
-                  {shift.position} ({shift.username})
-                </div>
-              ))}
-              {openShifts.map((shift, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    background: '#d32f2f',
-                    color: '#fff',
-                    borderRadius: '6px',
-                    padding: '4px 8px',
-                    margin: '4px 0',
-                    fontSize: '1.1rem'
-                  }}
-                >
-                  {shift.position} (Open)
-                </div>
-              ))}
-            </div>
-          );
-        })}
-      </div>
-    </>
-  );
-}
-
-function DayPopup({ day, users, freeShifts, onClose, onFreeShiftClick }) {
-  // Find users working for the selected day
-  const working = [];
-  users.forEach(u => {
-    if (u.datesWorking) {
-      u.datesWorking.forEach(d => {
-        if (d.date === day.date) {
-          working.push({ username: u.username, position: d.position });
-        }
-      });
-    }
-  });
-  // Find free shifts for the selected day
-  const dayFreeShifts = freeShifts.filter(shift => shift.date === day.date);
-  return (
-    <>
-      <div
-        style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.2)',
-          zIndex: 1999
-        }}
-        onClick={onClose}
-      ></div>
-      <div
-        style={{
-          position: 'fixed',
-          top: '30%',
-          left: '50%',
-          transform: 'translate(-50%, -30%)',
-          background: '#fff',
-          border: '1px solid #ccc',
-          borderRadius: '10px',
-          padding: '30px',
-          zIndex: 2000,
-          minWidth: '300px'
-        }}
-        onClick={e => e.stopPropagation()}
-      >
-        <h3>{day.label} ({day.date})</h3>
-        <p><strong>Working:</strong></p>
-        <ul>
-          {working.length > 0 ? working.map((u, idx) => (
-            <li key={idx}>{u.username} <span style={{color:'#888'}}>({u.position})</span></li>
-          )) : <li>No one working</li>}
-        </ul>
-        <p><strong>Free Shifts:</strong></p>
-        <ul>
-          {dayFreeShifts.length > 0 ? dayFreeShifts.map((shift, idx) => (
-            <li key={idx}>
-              <button
-                style={{
-                  background: '#f0f0f0',
-                  border: 'none',
-                  borderRadius: '5px',
-                  padding: '5px 10px',
-                  cursor: 'pointer'
-                }}
-                onClick={() => onFreeShiftClick(day, shift)}
-              >
-                {shift.position}
-              </button>
-            </li>
-          )) : <li>No free shifts</li>}
-        </ul>
-        <button onClick={onClose} style={{ marginTop: '10px' }}>Close</button>
-      </div>
-    </>
-  );
-}
-
-function FreeShiftPopup({ day, shift, onClose, onTakeShift }) {
-  return (
-    <>
-      <div
-        style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.2)',
-          zIndex: 2999
-        }}
-        onClick={onClose}
-      ></div>
-      <div
-        style={{
-          position: 'fixed',
-          top: '40%',
-          left: '50%',
-          transform: 'translate(-50%, -40%)',
-          background: '#fff',
-          border: '1px solid #ccc',
-          borderRadius: '10px',
-          padding: '30px',
-          zIndex: 3000,
-          minWidth: '300px'
-        }}
-        onClick={e => e.stopPropagation()}
-      >
-        <h3>Take Shift</h3>
-        <p>
-          Do you want to work on <strong>{day.label} ({day.date})</strong> as <strong>{shift.position}</strong>?
-        </p>
-        <button
-          style={{ marginRight: '10px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer' }}
-          onClick={() => onTakeShift(day, shift)}
-        >
-          Yes, I want this shift
-        </button>
-        <button onClick={onClose} style={{ background: '#f0f0f0', border: 'none', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer' }}>
-          Cancel
-        </button>
-      </div>
-    </>
-  );
-}
-
-export default function RosterPage() {
+// Main RosterPage component
+function RosterPage() {
   const { isLoggedIn, user } = useAuth();
+  const { settings: userSettings } = useUserSettings();
+  const [legendOpen, setLegendOpen] = useState(false);
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [users, setUsers] = useState([]);
   const [freeShifts, setFreeShifts] = useState([]);
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedFreeShift, setSelectedFreeShift] = useState(null);
-
-  // Use logged-in user from context
+  const [loading, setLoading] = useState(true);
   const currentUser = user ? user.username : null;
 
-  // Week selector state
- const startDate = new Date(2025, 6, 1); // July 1, 2025
- const endDate = new Date(2026, 11, 31); // December 31, 2026
- const allMondays = getAllMondaysInRange(startDate, endDate);
-function getAllMondaysInRange(start, end) {
-  const mondays = [];
-  let d = new Date(start);
-  d.setDate(d.getDate() + ((1 - d.getDay() + 7) % 7)); // Move to first Monday
-  while (d <= end) {
-    mondays.push(new Date(d));
-    d.setDate(d.getDate() + 7);
+  // Week/Month state
+  const today = new Date();
+  const [calendarRange, setCalendarRange] = useState({
+    start: new Date(today.getFullYear() - 2, 0, 1),
+    end: new Date(today.getFullYear() + 2, 11, 31)
+  });
+  function getAllMondaysInRange(start, end) {
+    const mondays = [];
+    let d = new Date(start);
+    d.setDate(d.getDate() + ((1 - d.getDay() + 7) % 7));
+    while (d <= end) {
+      mondays.push(new Date(d));
+      d.setDate(d.getDate() + 7);
+    }
+    return mondays;
   }
-  return mondays;
-}
-     const weekOptions = allMondays.map(monday => getWeekDates(monday));
-     const today = new Date();
-const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    // Find the week containing today
-    const initialWeekIdx = weekOptions.findIndex(week => week.some(day => day.date === todayStr));
-    const [selectedWeek, setSelectedWeek] = useState(initialWeekIdx !== -1 ? initialWeekIdx : 0);
-    const weekDays = weekOptions[selectedWeek] || [];
-    // Set initial month to the month of the Monday of the initial week
-    const initialMonday = weekOptions[selectedWeek]?.[0]?.date || todayStr;
-    const initialMonth = (() => {
-      const d = new Date(initialMonday);
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    })();
-    const [selectedMonth, setSelectedMonth] = useState(initialMonth);
+  const allMondays = getAllMondaysInRange(calendarRange.start, calendarRange.end);
+  const weekOptions = allMondays.map(monday => getWeekDates(monday));
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const initialWeekIdx = weekOptions.findIndex(week => week.some(day => day.date === todayStr));
+  const [selectedWeek, setSelectedWeek] = useState(initialWeekIdx !== -1 ? initialWeekIdx : 0);
+  const weekDays = weekOptions[selectedWeek] || [];
+  const initialMonday = weekOptions[selectedWeek]?.[0]?.date || todayStr;
+  const initialMonth = (() => {
+    const d = new Date(initialMonday);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  })();
+  const [selectedMonth, setSelectedMonth] = useState(initialMonth);
+  const monthPickerChangeRef = useRef(false);
 
-    // Update month when week changes
-    useEffect(() => {
-      const mondayDate = weekOptions[selectedWeek]?.[0]?.date;
-      if (mondayDate) {
-        const d = new Date(mondayDate);
-        const monthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  // Sync month when week changes
+  useEffect(() => {
+    if (monthPickerChangeRef.current) {
+      monthPickerChangeRef.current = false;
+      return;
+    }
+    const mondayDate = weekOptions[selectedWeek]?.[0]?.date;
+    if (mondayDate) {
+      const d = new Date(mondayDate);
+      const monthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      if (selectedMonth !== monthStr) {
         setSelectedMonth(monthStr);
       }
-    }, [selectedWeek, weekOptions]);
+    }
+  }, [selectedWeek, weekOptions, selectedMonth]);
+
+  // Robust week navigation
+  const prevCalendarRange = useRef(calendarRange);
+  const pendingMondayRef = useRef(null);
+  const handlePrevWeek = () => {
+    if (selectedWeek === 0) {
+      pendingMondayRef.current = weekOptions[selectedWeek][0].date;
+    }
+    setSelectedWeek(selectedWeek - 1);
+  };
+  const handleNextWeek = () => {
+    if (selectedWeek === weekOptions.length - 1) {
+      pendingMondayRef.current = weekOptions[selectedWeek][0].date;
+    }
+    setSelectedWeek(selectedWeek + 1);
+  };
+  useEffect(() => {
+    const prevStart = prevCalendarRange.current.start;
+    const prevEnd = prevCalendarRange.current.end;
+    if (calendarRange.start < prevStart || calendarRange.end > prevEnd) {
+      const mondayDate = pendingMondayRef.current;
+      if (mondayDate) {
+        const idx = weekOptions.findIndex(week => week[0].date === mondayDate);
+        if (idx !== -1) setSelectedWeek(idx);
+        pendingMondayRef.current = null;
+      }
+    }
+    prevCalendarRange.current = calendarRange;
+  }, [calendarRange, weekOptions]);
+
   // Redirect if not logged in
   useEffect(() => {
-    if (!isLoggedIn) {
-      navigate('/login');
-    }
+    if (!isLoggedIn) navigate('/login');
   }, [isLoggedIn, navigate]);
 
-  // Fetch users, shifts, assignments, unavailability, and roles from backend
+  // Fetch data
   useEffect(() => {
+    setLoading(true);
     const API_URL = process.env.REACT_APP_API_URL;
     Promise.all([
       fetch(`${API_URL}/api/users`).then(res => res.json()),
@@ -373,83 +145,59 @@ const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart
       fetch(`${API_URL}/api/roles`).then(res => res.json()),
       fetch(`${API_URL}/api/free_shifts`).then(res => res.json())
     ]).then(([usersData, assignmentsData, unavailData, rolesData, freeShiftsData]) => {
-      // Map role_id to role_name
       const roleIdToName = Object.fromEntries(rolesData.map(r => [r.role_id, r.role_name]));
-      // For each user, add datesWorking from assignments
-      const allShifts = [...freeShiftsData, ...assignmentsData.map(a => ({
-        shift_id: a.shift_id,
-        shift_date: a.shift_date,
-        role_id: a.role_id
-      }))];
+      const allShifts = [...freeShiftsData, ...assignmentsData.map(a => ({ shift_id: a.shift_id, shift_date: a.shift_date, role_id: a.role_id }))];
       const usersWithShifts = usersData.map(u => ({
         ...u,
-        datesWorking: assignmentsData
-          .filter(a => a.user_id === u.user_id)
-          .map(a => {
-            const shift = allShifts.find(s => s.shift_id === a.shift_id);
-            return shift ? { date: shift.shift_date ? shift.shift_date.slice(0,10) : null, position: roleIdToName[shift.role_id] } : null;
-          })
-          .filter(Boolean),
-        datesFree: unavailData
-          .filter(ua => ua.user_id === u.user_id)
-          .map(ua => ({ date: ua.unavailable_date, reason: ua.reason }))
+        datesWorking: assignmentsData.filter(a => a.user_id === u.user_id).map(a => {
+          const shift = allShifts.find(s => s.shift_id === a.shift_id);
+          return shift ? { date: shift.shift_date ? shift.shift_date.slice(0,10) : null, position: roleIdToName[shift.role_id] } : null;
+        }).filter(Boolean),
+        datesFree: unavailData.filter(ua => ua.user_id === u.user_id).map(ua => ({ date: ua.unavailable_date, reason: ua.reason }))
       }));
       setUsers(usersWithShifts);
-      setFreeShifts(
-        freeShiftsData.map(s => ({
-          id: s.shift_id,
-          date: s.shift_date ? s.shift_date.slice(0,10) : null,
-          position: roleIdToName[s.role_id]
-        }))
-      );
+      setFreeShifts(freeShiftsData.map(s => ({ id: s.shift_id, date: s.shift_date ? s.shift_date.slice(0,10) : null, position: roleIdToName[s.role_id] })));
+      setLoading(false);
     }).catch(() => {
       setUsers([]);
       setFreeShifts([]);
+      setLoading(false);
     });
-  }, []);
+  }, [user]);
 
-  if (!isLoggedIn) {
-    return null;
+  if (!isLoggedIn) return null;
+  if (loading) {
+    return <div style={{textAlign:'center',marginTop:'2rem',fontSize:'1.2rem'}}>Loading roster data...</div>;
   }
 
-  const handleFreeShiftClick = (day, shift) => {
-    setSelectedFreeShift({ day, shift });
-  };
+  const handleFreeShiftClick = (day, shift) => setSelectedFreeShift({ day, shift });
 
   const handleTakeShift = async (day, shift) => {
-    // Find current user in users list
     const user = users.find(u => u.username === currentUser);
     if (!user) {
-      alert('User not found.');
+      if (toast) toast.showToast('User not found.');
       setSelectedFreeShift(null);
       return;
     }
-    // Check if already working that day
-    // Get all shifts for this user
-    const userShifts = users
-      .filter(u => u.username === currentUser)
-      .flatMap(u => u.datesWorking || []);
+    const userShifts = users.filter(u => u.username === currentUser).flatMap(u => u.datesWorking || []);
     if (userShifts.some(d => d.date === day.date)) {
-      alert(`You are already working on ${day.label} (${day.date}). You cannot take another shift that day.`);
+      if (toast) toast.showToast(`You are already working on ${day.label} (${day.date}). You cannot take another shift that day.`);
       setSelectedFreeShift(null);
       return;
     }
-    // Find the shift id from freeShifts
     const shiftObj = freeShifts.find(s => s.date === day.date && s.position === shift.position);
     if (!shiftObj) {
-      alert('Shift not found.');
+      if (toast) toast.showToast('Shift not found.');
       setSelectedFreeShift(null);
       return;
     }
-    // Call API to take shift (create assignment)
     try {
-  const API_URL = process.env.REACT_APP_API_URL;
-  await fetch(`${API_URL}/api/shift_assignments`, {
+      const API_URL = process.env.REACT_APP_API_URL;
+      await fetch(`${API_URL}/api/shift_assignments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ shift_id: shiftObj.id, user_id: user.user_id })
       });
-      // Refetch all data
       Promise.all([
         fetch(`${API_URL}/api/users`).then(res => res.json()),
         fetch(`${API_URL}/api/shift_assignments`).then(res => res.json()),
@@ -460,53 +208,86 @@ const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart
         const roleIdToName = Object.fromEntries(rolesData.map(r => [r.role_id, r.role_name]));
         const usersWithShifts = usersData.map(u => ({
           ...u,
-          datesWorking: assignmentsData
-            .filter(a => a.user_id === u.user_id)
-            .map(a => {
-              return { date: a.shift_date ? a.shift_date.slice(0,10) : null, position: roleIdToName[a.role_id] };
-            })
-            .filter(Boolean),
-          datesFree: unavailData
-            .filter(ua => ua.user_id === u.user_id)
-            .map(ua => ({ date: ua.unavailable_date, reason: ua.reason }))
+          datesWorking: assignmentsData.filter(a => a.user_id === u.user_id).map(a => {
+            return { date: a.shift_date ? a.shift_date.slice(0,10) : null, position: roleIdToName[a.role_id] };
+          }).filter(Boolean),
+          datesFree: unavailData.filter(ua => ua.user_id === u.user_id).map(ua => ({ date: ua.unavailable_date, reason: ua.reason }))
         }));
         setUsers(usersWithShifts);
-        setFreeShifts(
-          freeShiftsData.map(s => ({
-            id: s.shift_id,
-            date: s.shift_date ? s.shift_date.slice(0,10) : null,
-            position: roleIdToName[s.role_id]
-          }))
-        );
+        setFreeShifts(freeShiftsData.map(s => ({ id: s.shift_id, date: s.shift_date ? s.shift_date.slice(0,10) : null, position: roleIdToName[s.role_id] })));
       });
     } catch (err) {
-      alert('Error taking shift.');
+      if (toast) toast.showToast('Error taking shift.');
     }
     setSelectedFreeShift(null);
     setSelectedDay(null);
   };
 
+  // ...existing code...
   return (
     <div className="roster-container">
       <h2 className="roster-title">Roster Page</h2>
-      <WeekSelector
-        selectedMonth={selectedMonth}
-        setSelectedMonth={setSelectedMonth}
-        selectedWeek={selectedWeek}
-        setSelectedWeek={setSelectedWeek}
-        weekOptions={weekOptions}
-      />
+  {/* Only one WeekSelector/month selector, with legend icon next to it */}
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    height: 48, // Ensures enough height for vertical centering
+    width: '100%',
+  }}>
+        <WeekSelector
+          selectedMonth={selectedMonth}
+          setSelectedMonth={month => {
+            monthPickerChangeRef.current = true;
+            setSelectedMonth(month);
+          }}
+          selectedWeek={selectedWeek}
+          setSelectedWeek={setSelectedWeek}
+          weekOptions={weekOptions}
+          calendarRange={calendarRange}
+          setCalendarRange={setCalendarRange}
+        />
+        {(userSettings?.shiftColors === 'on' || userSettings?.shiftColors === 'true' || userSettings?.shiftColors === '1') && (
+          <span
+            style={{
+              cursor: 'pointer',
+              fontSize: 18,
+              color: '#1976d2',
+              marginLeft: 6,
+              userSelect: 'none',
+              borderRadius: '50%',
+              width: 32,
+              height: 32,
+              lineHeight: '32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              alignSelf: 'center',
+              boxSizing: 'border-box'
+            }}
+            title="Show shift color legend"
+            onClick={() => setLegendOpen(true)}
+            onMouseEnter={() => setLegendOpen(true)}
+            onMouseLeave={() => setLegendOpen(false)}
+          >
+            ?
+          </span>
+        )}
+      </div>
       <DaysBar
         weekDays={weekDays}
         users={users}
         freeShifts={freeShifts}
         currentUser={currentUser}
         onDayClick={setSelectedDay}
-  onPrevWeek={() => setSelectedWeek(selectedWeek - 1)}
-  onNextWeek={() => setSelectedWeek(selectedWeek + 1)}
+        onPrevWeek={handlePrevWeek}
+        onNextWeek={handleNextWeek}
         prevDisabled={selectedWeek === 0}
         nextDisabled={selectedWeek === weekOptions.length - 1}
+        shiftColors={userSettings?.shiftColors}
       />
+      <ShiftColorLegendPopup open={legendOpen} onClose={() => setLegendOpen(false)} />
       {selectedDay &&
         <DayPopup
           day={selectedDay}
@@ -524,6 +305,11 @@ const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart
           onTakeShift={handleTakeShift}
         />
       }
+
+
+
     </div>
   );
 }
+
+export default RosterPage;
