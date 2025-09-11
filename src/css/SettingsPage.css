@@ -1,0 +1,15 @@
+.settings-page-container {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 32px 24px;
+}
+.settings-section {
+  margin-top: 24px;
+  font-size: 1.1rem;
+}
+.settings-section > div {
+  margin-bottom: 12px;
+}

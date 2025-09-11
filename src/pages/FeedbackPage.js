@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useToast } from '../components/ToastContext';
+import { useNavigate } from 'react-router';
 import { useAuth } from '../context/AuthContext';
 import '../css/FeedbackPage.css';
 
@@ -33,6 +34,7 @@ const FeedbackPage = () => {
     // eslint-disable-next-line
   }, [user]);
 
+  const toast = useToast();
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!anonymous && name.trim() === '') {
@@ -55,7 +57,7 @@ const FeedbackPage = () => {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        alert('Feedback submitted!');
+        if (toast) toast.showToast('Feedback submitted!');
         setSubject('');
         setDescription('');
         setName(getDefaultName());
@@ -72,20 +74,23 @@ const FeedbackPage = () => {
     <div className="feedback-container">
       <h2>Feedback</h2>
       <form className="feedback-form" onSubmit={handleSubmit}>
-  <label>Subject: <span style={{fontWeight: 'normal', color: '#888', fontSize: '0.95em'}}>(optional)</span></label>
+        <label htmlFor="subject">Subject: <span style={{fontWeight: 'normal', color: '#888', fontSize: '0.95em'}}>(optional)</span></label>
         <input
+          id="subject"
           type="text"
           value={subject}
           onChange={e => setSubject(e.target.value)}
         />
-        <label>Description:</label>
+        <label htmlFor="description">Description:</label>
         <textarea
+          id="description"
           value={description}
           onChange={e => setDescription(e.target.value)}
           required
         />
-        <label>Name:</label>
+        <label htmlFor="name">Name:</label>
         <input
+          id="name"
           type="text"
           value={name}
           onChange={e => setName(e.target.value)}
