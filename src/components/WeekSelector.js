@@ -3,7 +3,7 @@ import MonthPicker from './MonthPicker';
 
 function WeekSelector({ selectedMonth, setSelectedMonth, selectedWeek, setSelectedWeek, weekOptions, calendarRange, setCalendarRange }) {
   const pendingMonthRef = useRef(null);
-  const monthInputRef = useRef(null);
+  // Removed unused monthInputRef
 
   function handleMonthChange(e) {
     setSelectedMonth(e.target.value);

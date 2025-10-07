@@ -10,7 +10,7 @@ function LoginPage() {
     const { login, roles, isLoggedIn } = useAuth();
  const navigate = useNavigate();
   const location = useLocation();
-  const [loading, setLoading] = useState(false);
+  // Removed unused loading state
 
   // Redirect if already logged in
   React.useEffect(() => {
@@ -26,7 +26,7 @@ function LoginPage() {
       setError('Username and password are required.');
       return;
     }
-    setLoading(true);
+  // setLoading(true); (removed)
     try {
   const API_URL = process.env.REACT_APP_API_URL;
   const res = await fetch(`${API_URL}/api/login`, {
@@ -46,7 +46,7 @@ function LoginPage() {
     } catch (err) {
       setError('Error connecting to server.');
     }
-    setLoading(false);
+  // setLoading(false); (removed)
   };
 
   return (

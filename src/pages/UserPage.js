@@ -11,8 +11,9 @@ import '../css/UserPage.css';
 
 export default function UserPage() {
   const { isLoggedIn, roles } = useAuth();
-    const navigate = useNavigate();
-    const [users, setUsers] = useState([]);
+  const navigate = useNavigate();
+  const [users, setUsers] = useState([]);
+  const API_URL = process.env.REACT_APP_API_URL || '';
   const [editUser, setEditUser] = useState(null);
   const [deleteUser, setDeleteUser] = useState(null);
   const [addUserPopup, setAddUserPopup] = useState(false);
@@ -21,6 +22,7 @@ export default function UserPage() {
   
   console.log('UserPage roles:', roles);
 
+  const roleHierarchy = ['user', 'test', 'admin', 'superadmin'];
   useEffect(() => {
     if (!isLoggedIn) {
       navigate('/login', { state: { from: '/users' } });
@@ -29,7 +31,7 @@ export default function UserPage() {
     setCheckingAuth(false);
     console.log('[UserPage] Checking roles for user list:', roles);
     if (roles.includes('admin') || roles.includes('superadmin')) {
-      fetch('/api/users')
+      fetch(`${API_URL}/api/users`)
         .then(res => res.json())
         .then(data => {
           console.log('[UserPage] Users fetched from database:', data);
@@ -37,7 +39,7 @@ export default function UserPage() {
         })
         .catch(() => setUsers([]));
     }
-  }, [isLoggedIn, roles, navigate]);
+  }, [isLoggedIn, roles, navigate, API_URL]);
 
 
   const handleSaveEdit = async (updatedUser) => {
@@ -49,7 +51,7 @@ export default function UserPage() {
   const handleAddUser = async (newUser) => {
     try {
       // Create user first
-  const userRes = await fetch('/api/users', {
+  const userRes = await fetch(`${API_URL}/api/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -63,14 +65,14 @@ export default function UserPage() {
       const userData = await userRes.json();
       // Add roles for user
       for (const role_id of newUser.roles) {
-  await fetch('/api/user_roles', {
+  await fetch(`${API_URL}/api/user_roles`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ user_id: userData.user_id, role_id })
         });
       }
       // Refetch users after adding
-  const res = await fetch('/api/users');
+  const res = await fetch(`${API_URL}/api/users`);
       const updatedUsers = await res.json();
       setUsers(updatedUsers);
     } catch (err) {
@@ -82,11 +84,11 @@ export default function UserPage() {
   
   const handleDeleteUser = async (userId) => {
     try {
-  await fetch(`/api/users/${userId}`, {
+  await fetch(`${API_URL}/api/users/${userId}`, {
         method: 'DELETE'
       });
-      // Refetch users after deletion
-  const res = await fetch('/api/users');
+      // Refetch users after deleting
+  const res = await fetch(`${API_URL}/api/users`);
       const updatedUsers = await res.json();
       setUsers(updatedUsers);
     } catch (err) {
@@ -98,8 +100,7 @@ export default function UserPage() {
   if (checkingAuth) {
     return <div className="userpage-container"><h2>Checking permissions...</h2></div>;
   }
-  // Hierarchical role logic: superadmin > admin > test > user
-  const roleHierarchy = ['user', 'test', 'admin', 'superadmin'];
+ 
   // Minimum required role for this page
   const requiredRole = 'admin';
   // Find highest role of current user
