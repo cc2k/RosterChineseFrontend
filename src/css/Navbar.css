@@ -1,3 +1,44 @@
+.navbar-horizontal-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.navbar-horizontal-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  margin-left: auto;
+}
+.navbar-horizontal-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.navbar-vertical-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0);
+  z-index: 998;
+}
+.navbar-vertical {
+  z-index: 999;
+}
+.navbar-vertical-hamburger {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+.navbar-vertical-logout {
+  cursor: pointer;
+}
 /* Navbar container */
 .navbar-vertical {
   position: fixed;
@@ -10,11 +51,16 @@
   display: flex;
   flex-direction: column;
   transform: translateX(-100%);
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, background-color 0.2s, color 0.2s;
   z-index: 999;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 0 10px 10px 0;
   overflow: hidden;
+}
+
+body.dark-mode .navbar-vertical {
+  background-color: #23272f;
+  color: #e0e0e0;
 }
 
 /* Show the navbar when open */
@@ -24,21 +70,28 @@
 }
 
 /* Hamburger icon (inside navbar) */
+
+
 .hamburger-vertical {
-top: 10px;
-left: 10px;
-position: absolute;
+  position: fixed;
+  top: 18px;
+  left: 18px;
   font-size: 24px;
-  width: 25px;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
   color: #007bff;
-  padding: 10px;
-  }
+  padding: 6px;
+  background: transparent;
+  border: none;
+  z-index: 1100;
+}
 
 /* Change hamburger to red cross when navbar is open */
 .navbar-vertical.open .hamburger-vertical {
   color: #ff0000; /* Red color for the cross */
   transform: rotate(45deg); /* Rotate to form a cross */
+  
 }
 
 /* Navigation links container */
@@ -58,8 +111,12 @@ position: absolute;
   font-size: 18px;
   padding: 10px 15px;
   border-radius: 5px;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.2s, color 0.2s;
   font-family: 'Arial', sans-serif;
+}
+
+body.dark-mode .nav-vertical-links li a {
+  color: #f1c40f;
 }
 
 .nav-vertical-links li a:hover {
@@ -77,6 +134,7 @@ position: absolute;
 
 /* Navbar styles for horizontal layout */
 
+
 .navbar-horizontal {
   display: flex;
   justify-content: space-between; /* Space between left and right elements */
@@ -85,6 +143,13 @@ position: absolute;
   background-color: #f8f9fa;
   border-bottom: 1px solid #ddd;
   position: relative; /* Needed for absolute centering of the title */
+  transition: background-color 0.2s, color 0.2s;
+}
+
+body.dark-mode .navbar-horizontal {
+  background-color: #23272f;
+  border-bottom: 1px solid #444;
+  color: #e0e0e0;
 }
 
 .navbar-horizontal-content {
@@ -102,6 +167,7 @@ position: absolute;
   text-align: center;
 }
 
+
 .navbar-horizontal-link {
   background: none;
   width: auto; /* Allow the link to take its natural width */
@@ -112,6 +178,11 @@ position: absolute;
   cursor: pointer;
   text-decoration: none; /* Remove default underline */
   padding: 0;
+  transition: color 0.2s;
+}
+
+body.dark-mode .navbar-horizontal-link {
+  color: #f1c40f;
 }
 
 .navbar-horizontal-link:hover {

@@ -10,7 +10,7 @@ export default function UserShiftsPopup({ user, onClose }) {
         <h3>Manage Shifts for {user.username}</h3>
         <UserDefaultSchedule user={user} defaultSchedule={user.defaultSchedule} onChange={() => {}} />
         <UserShiftsEditor user={user} shifts={user.shifts} onChange={() => {}} />
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
+        <div className="user-shifts-btn-row">
           <button onClick={onClose}>Close</button>
         </div>
       </div>

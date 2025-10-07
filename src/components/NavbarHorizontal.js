@@ -1,6 +1,60 @@
+
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Import the AuthContext
+import { useAuth } from '../context/AuthContext';
 import '../css/Navbar.css';
+
+// Light/Dark mode toggle button component
+function LightDarkToggle() {
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
+  const { user } = require('../context/AuthContext').useAuth();
+
+  // Only update DOM and localStorage when darkMode changes
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark-mode');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [darkMode]);
+
+  // Only send PUT once per user click
+  const handleToggle = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    if (user && user.user_id) {
+      const API_URL = process.env.REACT_APP_API_URL;
+      console.log(`[DarkMode PUT] Navbar: Sending PUT for user ${user.user_id} with value:`, newMode ? 'on' : 'off');
+      fetch(`${API_URL}/api/user-settings/${user.user_id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ darkMode: newMode ? 'on' : 'off', source: 'navbar', editor_user_id: user.user_id })
+      });
+    }
+  };
+
+  return (
+    <button
+      className="navbar-horizontal-link navbar-horizontal-btn"
+      onClick={handleToggle}
+      title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+    >
+      {/* Sun/Moon icon */}
+      {darkMode ? (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="6" fill="#f1c40f" />
+          <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="#f1c40f" strokeWidth="2" />
+        </svg>
+      ) : (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" fill="#2c3e50" />
+        </svg>
+      )}
+    </button>
+  );
+}
 
 function NavbarHorizontal() {
     const { isLoggedIn, logout } = useAuth();
@@ -15,14 +69,13 @@ function NavbarHorizontal() {
   
     return (
       <header className="navbar-horizontal">
-        <div className="navbar-horizontal-content" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+  <div className="navbar-horizontal-content">
           <h1 className="navbar-horizontal-title">Tong ah</h1>
-          <div className="navbar-horizontal-actions" style={{ display: 'flex', flexDirection: 'row', gap: '12px', alignItems: 'center', marginLeft: 'auto' }}>
+          <div className="navbar-horizontal-actions">
             {isLoggedIn && (
               <>
                 <button
-                  className="navbar-horizontal-link"
-                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                  className="navbar-horizontal-link navbar-horizontal-btn"
                   onClick={() => navigate('/feedback')}
                   title="Feedback"
                 >
@@ -34,9 +87,10 @@ function NavbarHorizontal() {
                     <circle cx="16" cy="10" r="1" fill="#2c3e50" />
                   </svg>
                 </button>
+                  {/* Light/Dark mode toggle button */}
+                  <LightDarkToggle />
                 <button
-                  className="navbar-horizontal-link"
-                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                  className="navbar-horizontal-link navbar-horizontal-btn"
                   onClick={() => navigate('/profile')}
                   title="Profile"
                 >

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import RoleSelector from './RoleSelector';
+import { useAuth } from '../context/AuthContext';
+import { hasRequiredRole } from '../utils/roleUtils';
 
 export default function AddUserPopup({ onClose, onAdd }) {
   const [firstName, setFirstName] = useState('');
@@ -8,6 +10,19 @@ export default function AddUserPopup({ onClose, onAdd }) {
   const [email, setEmail] = useState('');
   const [telephone, setTelephone] = useState('');
   const [selectedRoles, setSelectedRoles] = useState([]);
+  const { roles } = useAuth();
+
+  if (!hasRequiredRole(roles, 'admin')) {
+    return (
+      <div className="popup-overlay">
+        <div className="popup-content">
+          <h3>Access Denied</h3>
+          <p>You do not have permission to add users.</p>
+          <button type="button" onClick={onClose}>Close</button>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();

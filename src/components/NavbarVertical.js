@@ -19,34 +19,33 @@ function NavbarVertical() {
 
   return (
     <>
-      {/* Hamburger Icon */}
-      <div className="hamburger-vertical" onClick={toggleMenu}>
-        ☰
-      </div>
+      {/* Hamburger Icon - only show when menu is closed */}
+      {!isMenuOpen && (
+        <div className="hamburger-vertical" onClick={toggleMenu}>
+          ☰
+        </div>
+      )}
 
       {/* Overlay to close navbar when clicking outside */}
       {isMenuOpen && (
         <div
           className="navbar-vertical-overlay"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            background: 'rgba(0,0,0,0)',
-            zIndex: 998
-          }}
           onClick={() => setIsMenuOpen(false)}
         />
       )}
 
       {/* Navbar */}
-      <nav className={`navbar-vertical ${isMenuOpen ? 'open' : ''}`} style={{ zIndex: 999 }}>
+  <nav className={`navbar-vertical ${isMenuOpen ? 'open' : ''}`}>
+        {/* Hamburger Icon inside navbar when open */}
+        {isMenuOpen && (
+          <div className="hamburger-vertical navbar-vertical-hamburger" onClick={toggleMenu}>
+            ☰
+          </div>
+        )}
         <ul className="nav-vertical-links">
           <li>
             {isLoggedIn ? (
-              <span style={{ cursor: 'pointer' }} onClick={() => { logout(); toggleMenu(); }}>Logout</span>
+              <span className="navbar-vertical-logout" onClick={() => { logout(); toggleMenu(); }}>Logout</span>
             ) : (
               <Link to="/" onClick={toggleMenu}>Login</Link>
             )}
@@ -58,10 +57,18 @@ function NavbarVertical() {
           <li>
             <Link to="/profile" onClick={toggleMenu}>Profile</Link>
           </li>
-          {roles && roles.includes('admin') && (
-            <li>
-              <Link to="/users" onClick={toggleMenu}>Users</Link>
-            </li>
+          {roles && (roles.includes('admin') || roles.includes('superadmin')) && (
+            <>
+              <li>
+                <Link to="/users" onClick={toggleMenu}>Users</Link>
+              </li>
+              <li>
+                <Link to="/shifts" onClick={toggleMenu}>Shifts</Link>
+              </li>
+              <li>
+                <Link to="/log" onClick={toggleMenu}>Audit Log</Link>
+              </li>
+            </>
           )}
           <li>
             <Link to="/settings" onClick={toggleMenu}>Settings</Link>

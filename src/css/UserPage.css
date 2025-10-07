@@ -45,34 +45,35 @@
   background: #d32f2f;
 }
 /* UserPage.css */
+/* ...existing code... */
 .userpage-container {
   padding: 2rem;
   background: #f9f9f9;
   min-height: 80vh;
 }
-.userpage-title {
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
-  color: #007bff;
+body.dark-mode .userpage-container {
+  background: #23272e;
 }
-.userpage-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+body.dark-mode .userpage-title {
+  color: #f1c40f;
 }
-.userpage-table th, .userpage-table td {
-  border: 1px solid #e0e0e0;
+body.dark-mode .userpage-table {
+  background: #23272e;
+  color: #eee;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+body.dark-mode .userpage-table th, body.dark-mode .userpage-table td {
+  border: 1px solid #444;
   padding: 10px 14px;
   text-align: left;
 }
-.userpage-table th {
-  background: #f0f8ff;
-  color: #333;
+body.dark-mode .userpage-table th {
+  background: #333;
+  color: #f1c40f;
 }
-.userpage-table tr:nth-child(even) {
-  background: #f6f6f6;
+body.dark-mode .userpage-table tr:nth-child(even) {
+  background: #23272e;
 }
-.userpage-table tr:hover {
-  background: #e3f2fd;
+body.dark-mode .userpage-table tr:hover {
+  background: #444;
 }

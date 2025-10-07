@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
@@ -14,17 +14,29 @@ import SettingsPage from './pages/SettingsPage';
 import NavbarVertical from './components/NavbarVertical';
 import NavbarHorizontal from './components/NavbarHorizontal';
 
+import ShiftsPage from './pages/ShiftsPage';
+import LogPage from './pages/LogPage';
+
+
 function App() {
   const location = useLocation();
   const { isLoggedIn, roles } = useAuth();
-
-  // Define routes where the Navbar should be visible
   const showNavbarVertical = location.pathname !== '/' && location.pathname !== '/login';
 
+  // Detect dark mode from localStorage
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
+  useEffect(() => {
+    const handler = () => setDarkMode(localStorage.getItem('theme') === 'dark');
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
+  }, []);
 
+  useEffect(() => {
+    setDarkMode(localStorage.getItem('theme') === 'dark');
+  });
 
   return (
-    <>
+    <div className="App">
       <NavbarHorizontal />
       {showNavbarVertical && <NavbarVertical />}
       <Routes>
@@ -33,6 +45,11 @@ function App() {
         <Route path="/roster" element={<RosterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/shifts" element={
+          <AdminRoute>
+            <ShiftsPage />
+          </AdminRoute>
+        } />
         <Route path="/users" element={
           <AdminRoute>
             <UserPage />
@@ -40,8 +57,13 @@ function App() {
         } />
         <Route path="/feedback" element={<FeedbackPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/log" element={
+          <AdminRoute>
+            <LogPage />
+          </AdminRoute>
+        } />
       </Routes>
-    </>
+    </div>
   );
 }
 

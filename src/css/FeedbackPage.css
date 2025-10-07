@@ -1,10 +1,21 @@
+body.dark-mode .feedback-container {
+  background: #23272f;
+  color: #e0e0e0;
+}
 .feedback-container {
-  max-width: 500px;
-  margin: 2rem auto;
-  padding: 2rem;
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 2rem 1.5rem;
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px #0001;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  transition: background 0.2s, color 0.2s;
+}
+
+body.dark-mode .feedback-container {
+  background: #23272f !important;
+  color: #e0e0e0 !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
 }
 
 .feedback-container h2 {
@@ -26,6 +37,17 @@
   border-radius: 4px;
   font-size: 1rem;
   box-sizing: border-box;
+}
+.feedback-form input[type="text"],
+.feedback-form textarea {
+  transition: background 0.2s, color 0.2s;
+}
+
+body.dark-mode .feedback-form input[type="text"],
+body.dark-mode .feedback-form textarea {
+  background: #23272f;
+  color: #e0e0e0;
+  border: 1px solid #444;
 }
 
 .feedback-form textarea {
@@ -52,6 +74,14 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 1rem;
+}
+body.dark-mode .feedback-form button[type="submit"] {
+  background: #f1c40f;
+  color: #23272f;
+}
+body.dark-mode .feedback-form button[type="submit"]:hover {
+  background: #ffe066;
+  color: #23272f;
 }
 
 .feedback-form button[type="submit"]:hover {

@@ -65,25 +65,30 @@ function WeekSelector({ selectedMonth, setSelectedMonth, selectedWeek, setSelect
         >
           {weekOptions.map((week, idx) => {
             function getISOWeek(dateStr) {
-              const date = new Date(dateStr);
+              const date = parseDMY(dateStr); // Use DD/MM/YYYY parser
               date.setHours(0, 0, 0, 0);
               date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
               const week1 = new Date(date.getFullYear(), 0, 4);
               return 1 + Math.round(((date - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
             }
-            function formatDMY(dateStr) {
-              const d = new Date(dateStr);
+            function parseDMY(dateStr) {
+              // Expects DD/MM/YYYY
+              const [dd, mm, yyyy] = dateStr.split('/');
+              return new Date(`${yyyy}-${mm}-${dd}`);
+            }
+            function formatDMY2(dateStr) {
+              const d = parseDMY(dateStr);
               const dd = String(d.getDate()).padStart(2, '0');
               const mm = String(d.getMonth() + 1).padStart(2, '0');
-              const yyyy = d.getFullYear();
-              return `${dd}-${mm}-${yyyy}`;
+              const yy = String(d.getFullYear()).slice(-2);
+              return `${dd}/${mm}/${yy}`;
             }
             const weekNr = getISOWeek(week[0].date);
-            const monday = formatDMY(week[0].date);
-            const sunday = formatDMY(week[6].date);
+            const monday = formatDMY2(week[0].date);
+            const sunday = formatDMY2(week[6].date);
             return (
               <option key={idx} value={idx}>
-                Week {weekNr}: Monday {monday} - Sunday {sunday}
+                Week {weekNr}: Mon {monday} | Sun {sunday}
               </option>
             );
           })}

@@ -130,21 +130,27 @@ const ProfilePage = () => {
     <div className="profile-container">
       <h2>Profile</h2>
       <div className="profile-info">
-        <form onSubmit={handleProfileChange} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
+        <form onSubmit={handleProfileChange} className="profile-form">
           <label htmlFor="edit-username"><strong>Username:</strong></label>
-          <input id="edit-username" type="text" value={editUsername} onChange={e => setEditUsername(e.target.value)} placeholder="N/A" style={{ maxWidth: '300px', padding: '6px', fontSize: '1rem' }} />
+          <input id="edit-username" type="text" value={editUsername} onChange={e => setEditUsername(e.target.value)} placeholder="N/A" className="profile-input" />
           <label htmlFor="edit-firstname"><strong>First Name:</strong></label>
-          <input id="edit-firstname" type="text" value={editFirstname} onChange={e => setEditFirstname(e.target.value)} placeholder="N/A" style={{ maxWidth: '300px', padding: '6px', fontSize: '1rem' }} />
+          <input id="edit-firstname" type="text" value={editFirstname} onChange={e => setEditFirstname(e.target.value)} placeholder="N/A" className="profile-input" />
           <label htmlFor="edit-surname"><strong>Surname:</strong></label>
-          <input id="edit-surname" type="text" value={editSurname} onChange={e => setEditSurname(e.target.value)} placeholder="N/A" style={{ maxWidth: '300px', padding: '6px', fontSize: '1rem' }} />
+          <input id="edit-surname" type="text" value={editSurname} onChange={e => setEditSurname(e.target.value)} placeholder="N/A" className="profile-input" />
           <label htmlFor="edit-email"><strong>Email:</strong></label>
-          <input id="edit-email" type="email" value={editEmail} onChange={e => setEditEmail(e.target.value)} placeholder="N/A" style={{ maxWidth: '300px', padding: '6px', fontSize: '1rem' }} />
+          <input id="edit-email" type="email" value={editEmail} onChange={e => setEditEmail(e.target.value)} placeholder="N/A" className="profile-input" />
           <label htmlFor="edit-telephone"><strong>Telephone:</strong></label>
-          <input id="edit-telephone" type="text" value={editTelephone} onChange={e => setEditTelephone(e.target.value)} placeholder="N/A" style={{ maxWidth: '300px', padding: '6px', fontSize: '1rem' }} />
-          <button type="submit" style={{ marginTop: '1rem', padding: '8px 24px', fontSize: '1rem', background: '#1976d2', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', maxWidth: '180px' }}>Save Changes</button>
+          <input id="edit-telephone" type="text" value={editTelephone} onChange={e => setEditTelephone(e.target.value)} placeholder="N/A" className="profile-input" />
+          <button type="submit" className="profile-btn">Save Changes</button>
         </form>
         {profileMsg && <div className="profile-msg">{profileMsg}</div>}
-        <p><strong>Roles:</strong> {profile.roles && profile.roles.length > 0 ? profile.roles.join(', ') : 'N/A'}</p>
+        <p><strong>Roles:</strong> {
+          profile.roles && profile.roles.length > 0
+            ? profile.roles
+                .filter(role => role !== 'superadmin' || (user && user.roles && user.roles.includes('superadmin')))
+                .join(', ') || 'N/A'
+            : 'N/A'
+        }</p>
       </div>
       <div className="profile-password-box">
         <h3>Change Password</h3>

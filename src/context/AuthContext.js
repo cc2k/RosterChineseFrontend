@@ -24,10 +24,19 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('roles', JSON.stringify(roles));
   }, [isLoggedIn, user, roles]);
 
-  const login = (userObj) => {
+  const logWithDate = (...args) => {
+    const now = new Date().toISOString();
+    console.log(`[AuthContext][${now}]`, ...args);
+  };
+
+  const login = async (userObj) => {
     setIsLoggedIn(true);
     setUser(userObj);
     setRoles(userObj.roles || []);
+    logWithDate('Login user:', userObj);
+    logWithDate('Login roles:', userObj.roles);
+    // Immediately refetch roles from backend after login
+    await refetchUser();
   };
   const logout = () => {
     setIsLoggedIn(false);
@@ -38,8 +47,34 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('roles');
   };
 
+  // Add a function to refetch user info/roles from backend
+  const refetchUser = async () => {
+    const currentUser = user || {};
+    logWithDate('RefetchUser called for:', currentUser);
+    if (!currentUser.user_id) return;
+    try {
+      const API_URL = process.env.REACT_APP_API_URL;
+      const res = await fetch(`${API_URL}/api/users/${currentUser.user_id}`);
+      const data = await res.json();
+      logWithDate('RefetchUser response:', data);
+      if (data && data.user_id) {
+        setUser(data);
+        setRoles(data.roles || []);
+        logWithDate('Refetch roles:', data.roles);
+      }
+    } catch (err) {
+      logWithDate('RefetchUser error:', err);
+    }
+  };
+
+  // Call refetchUser after any role change
+  useEffect(() => {
+    refetchUser();
+    // eslint-disable-next-line
+  }, [roles.length]);
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, roles, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, user, roles, login, logout, refetchUser }}>
       {children}
     </AuthContext.Provider>
   );

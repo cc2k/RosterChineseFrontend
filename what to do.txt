@@ -1,7 +1,8 @@
 frontend
 
-- shifting when selecting different week (rosterPage)
-- datum days not YYY-MM-DD 
-- testing loading spinner
+-home page, 
+    - adding free shifts to easy pick
+    
+    
 
 backend

@@ -6,9 +6,13 @@ export function getWeekDates(monday) {
   for (let i = 0; i < 7; i++) {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
+    // Format as DD/MM/YYYY
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
     week.push({
       label: d.toLocaleDateString('en-US', { weekday: 'short' }),
-      date: d.toISOString().slice(0, 10)
+      date: `${dd}/${mm}/${yyyy}`
     });
   }
   return week;

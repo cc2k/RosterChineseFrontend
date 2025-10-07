@@ -9,7 +9,33 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+body.dark-mode, html.dark-mode {
+  background: #181a1b !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .navbar-horizontal,
+body.dark-mode .navbar-vertical {
+  background: #23272f;
+  color: #e0e0e0;
+}
+
+body.dark-mode .navbar-horizontal-link {
+  background: transparent;
+  color: #f1c40f;
+}
+
+body.dark-mode .App-header {
+  background-color: #23272f;
+  color: #e0e0e0;
+}
+
+body.dark-mode a,
+body.dark-mode .App-link {
+  color: #f1c40f;
 }
