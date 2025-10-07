@@ -31,7 +31,10 @@ export default function UserPage() {
     if (roles.includes('admin') || roles.includes('superadmin')) {
       fetch('/api/users')
         .then(res => res.json())
-        .then(setUsers)
+        .then(data => {
+          console.log('[UserPage] Users fetched from database:', data);
+          setUsers(data);
+        })
         .catch(() => setUsers([]));
     }
   }, [isLoggedIn, roles, navigate]);
