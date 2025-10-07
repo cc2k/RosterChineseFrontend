@@ -1,3 +1,34 @@
+/* Contact Info Card Styles */
+.contact-info-card {
+  background: #f5f7fa;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  padding: 18px 24px 12px 24px;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-left: 4px solid #1976d2;
+}
+.contact-info-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: #1976d2;
+}
+.contact-info-row {
+  font-size: 1.08rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+body.dark-mode .contact-info-card {
+  background: #23272f;
+  color: #e0e0e0;
+  border-left: 4px solid #90caf9;
+}
+body.dark-mode .contact-info-card h3 {
+  color: #90caf9;
+}
 /* Profile form styles */
 .profile-form {
   display: flex;

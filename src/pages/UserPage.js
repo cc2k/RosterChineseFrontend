@@ -27,8 +27,9 @@ export default function UserPage() {
       return;
     }
     setCheckingAuth(false);
-    if (roles.includes('admin')) {
-  fetch('/api/users')
+    console.log('[UserPage] Checking roles for user list:', roles);
+    if (roles.includes('admin') || roles.includes('superadmin')) {
+      fetch('/api/users')
         .then(res => res.json())
         .then(setUsers)
         .catch(() => setUsers([]));

@@ -129,6 +129,13 @@ const ProfilePage = () => {
   return (
     <div className="profile-container">
       <h2>Profile</h2>
+      {/* Contact Info Card */}
+      <div className="contact-info-card">
+        <h3>Contact Info</h3>
+        <div className="contact-info-row"><strong>Username:</strong> {editUsername || 'N/A'}</div>
+        <div className="contact-info-row"><strong>Email:</strong> {editEmail || 'N/A'}</div>
+        <div className="contact-info-row"><strong>Telephone:</strong> {editTelephone || 'N/A'}</div>
+      </div>
       <div className="profile-info">
         <form onSubmit={handleProfileChange} className="profile-form">
           <label htmlFor="edit-username"><strong>Username:</strong></label>
