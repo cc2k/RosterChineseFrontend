@@ -1,3 +1,28 @@
+/* Profile form styles */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-input {
+  max-width: 300px;
+  padding: 6px;
+  font-size: 1rem;
+}
+
+.profile-btn {
+  margin-top: 1rem;
+  padding: 8px 24px;
+  font-size: 1rem;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  max-width: 180px;
+}
 .profile-container {
   max-width: 500px;
   margin: 40px auto;
@@ -5,6 +30,14 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   padding: 32px;
+}
+.profile-container {
+  transition: background 0.2s, color 0.2s;
+}
+
+body.dark-mode .profile-container {
+  background: #23272f;
+  color: #e0e0e0;
 }
 .profile-info p {
   font-size: 1.1em;
@@ -45,6 +78,15 @@
   margin-bottom: 4px;
   display: block;
 }
+.profile-password-box input[type="password"] {
+  transition: background 0.2s, color 0.2s;
+}
+
+body.dark-mode .profile-password-box input[type="password"] {
+  background: #23272f;
+  color: #e0e0e0;
+  border: 1px solid #444;
+}
 .profile-password-box button[type="submit"] {
   padding: 7px 18px;
   background: #2c3e50;
@@ -55,6 +97,14 @@
   cursor: pointer;
   margin-top: 8px;
   max-width: 220px;
+}
+body.dark-mode .profile-password-box button[type="submit"] {
+  background: #f1c40f;
+  color: #23272f;
+}
+body.dark-mode .profile-password-box button[type="submit"]:hover {
+  background: #ffe066;
+  color: #23272f;
 }
 .password-msg {
   margin-top: 12px;

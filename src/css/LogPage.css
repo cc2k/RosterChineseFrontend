@@ -1,0 +1,46 @@
+.log-page {
+  padding: 2rem;
+}
+.log-table {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+body.dark-mode .log-card {
+  background: #23272e !important;
+  color: #e0e0e0 !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  padding: 1rem 1.5rem;
+  min-width: 320px;
+  max-width: 400px;
+  border: 1px solid #444 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+body.dark-mode .log-card pre {
+  background: #181a1b !important;
+  color: #e0e0e0 !important;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.95em;
+  overflow-x: auto;
+  border: 1px solid #333;
+}
+.log-card button {
+  margin-top: 0.5rem;
+  align-self: flex-end;
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.4rem 1.2rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+.log-card button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}

@@ -38,7 +38,7 @@ export default function DaysBar({ weekDays, users, freeShifts, currentUser, onDa
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <polyline points="20,8 12,16 20,24" stroke="#007bff" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <span style={{ marginLeft: 6, fontSize: '1.1rem', color: '#007bff', verticalAlign: 'middle' }}>Prev</span>
+            <span className="week-arrow-text">Prev</span>
         </button>
         <button
           className="week-arrow right"
@@ -46,7 +46,7 @@ export default function DaysBar({ weekDays, users, freeShifts, currentUser, onDa
           disabled={nextDisabled}
           aria-label="Next Week"
         >
-          <span style={{ marginRight: 6, fontSize: '1.1rem', color: '#007bff', verticalAlign: 'middle' }}>Next</span>
+            <span className="week-arrow-text">Next</span>
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <polyline points="12,8 20,16 12,24" stroke="#007bff" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
           </svg>

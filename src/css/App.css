@@ -1,3 +1,117 @@
+.user-shifts-btn-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+.user-edit-btn-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+.user-popup-btn {
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+.user-popup-btn-delete {
+  background: #d32f2f;
+  color: #fff;
+}
+.user-popup-btn-cancel {
+  background: #f0f0f0;
+  color: #222;
+}
+.user-popup-btn-close {
+  background: #f0f0f0;
+  color: #222;
+}
+.free-shift-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.2);
+  z-index: 2999;
+}
+.free-shift-popup {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -40%);
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 30px;
+  z-index: 3000;
+  min-width: 300px;
+}
+.free-shift-btn {
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+.free-shift-btn-yes {
+  background: #007bff;
+  color: #fff;
+}
+.free-shift-btn-cancel {
+  background: #f0f0f0;
+  color: #222;
+}
+.edit-shift-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.edit-shift-textarea {
+  resize: vertical;
+}
+.edit-shift-btn-row {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+.add-shift-form {
+  padding: 8px 12px;
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  background: #f7f7f7;
+  color: inherit;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  border: 1px solid #ddd;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 1rem;
+  background: #23272f;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  align-items: center;
+  gap: 0.25rem;
+}
+.add-shift-btn-row {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+.dark-mode .App {
+  background: #181a1b;
+  color: #e0e0e0;
+}
 .App {
   text-align: center;
 }
@@ -26,6 +140,141 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.shift-card {
+  padding: 8px 12px;
+  margin: 6px 0;
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  background: #fff;
+  color: inherit;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: none;
+  transition: background 0.2s, color 0.2s;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 18px;
+}
+.dark-mode .shift-card {
+  background: #23272e;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+
+.role-selector-no-permission {
+  color: #888;
+  font-style: italic;
+  padding: 8px 0;
+}
+.role-selector-dropdown {
+  position: relative;
+  width: 220px;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+}
+.role-selector-btn {
+  width: 100%;
+  text-align: left;
+  padding: 4px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0;
+  transition: background 0.2s, color 0.2s;
+}
+.role-selector-selected {
+  flex: 1;
+  text-align: left;
+  color: #222;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+.role-selector-placeholder {
+  color: #888;
+}
+.role-selector-arrow {
+  margin-left: 8px;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+}
+.role-selector-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  z-index: 10;
+  margin-top: 2px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0;
+  text-align: left;
+}
+.role-selector-label {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 4px 8px;
+  text-align: left;
+  width: 100%;
+  justify-content: flex-start;
+  margin: 0 0 4px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fafbfc;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: border 0.2s;
+}
+.role-selector-checkbox {
+  margin: 0;
+  margin-right: 5px;
+  margin-bottom: 2px;
+  text-align: left;
+  accent-color: #1976d2;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+}
+.role-selector-name {
+  text-align: left;
+  min-width: 0;
+  flex: 1;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  line-height: 16px;
+}
+.dark-mode .role-selector-btn {
+  background: #23272e;
+  color: #e0e0e0;
+  border: 1px solid #444;
+}
+.dark-mode .role-selector-list {
+  background: #23272e;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.dark-mode .role-selector-label {
+  background: #23272e;
+  color: #e0e0e0;
+  border: 1px solid #444;
 }
 
 @keyframes App-logo-spin {

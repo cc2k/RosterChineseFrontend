@@ -1,6 +1,15 @@
 import React from 'react';
 
 export default function DayPopup({ day, users, freeShifts, onClose, onFreeShiftClick }) {
+  // Helper to format date as DD/MM/YYYY
+  function formatDMY(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  }
   // Find users working for the selected day
   const working = [];
   users.forEach(u => {
@@ -40,7 +49,7 @@ export default function DayPopup({ day, users, freeShifts, onClose, onFreeShiftC
         }}
         onClick={e => e.stopPropagation()}
       >
-        <h3>{day.label} ({day.date})</h3>
+        <h3>{day.label} ({formatDMY(day.date)})</h3>
         <p><strong>Working:</strong></p>
         <ul>
           {working.length > 0 ? working.map((u, idx) => (

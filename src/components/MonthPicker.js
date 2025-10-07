@@ -12,9 +12,14 @@ function getMonthName(monthStr) {
 }
 
 export default function MonthPicker({ value, onChange, style }) {
+  // Ensure value is a valid yyyy-MM string, else use empty string
+  const validValue =
+    typeof value === 'string' && /^\d{4}-\d{2}$/.test(value)
+      ? value
+      : '';
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: '100%', ...style }}>
-      <span style={{ display: 'flex', alignItems: 'center', height: '100%' }}>{getMonthName(value)}</span>
+      <span style={{ display: 'flex', alignItems: 'center', height: '100%' }}>{getMonthName(validValue)}</span>
       <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', height: '100%' }}>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: 'middle' }}>
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -24,7 +29,7 @@ export default function MonthPicker({ value, onChange, style }) {
         </svg>
         <input
           type="month"
-          value={value}
+          value={validValue}
           onChange={onChange}
           style={{
             position: 'absolute',
