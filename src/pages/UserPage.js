@@ -6,9 +6,8 @@ import UserEditPopup from '../components/UserEditPopup';
 import UserDeletePopup from '../components/UserDeletePopup';
 import AddUserPopup from '../components/AddUserPopup';
 import UserShiftsPopup from '../components/UserShiftsPopup';
+import UserCard from '../components/UserCard';
 import { hasRequiredRole } from '../utils/roleUtils';
-import '../css/UserPage.css';
-
 export default function UserPage() {
   const { isLoggedIn, roles } = useAuth();
   const navigate = useNavigate();
@@ -19,6 +18,8 @@ export default function UserPage() {
   const [addUserPopup, setAddUserPopup] = useState(false);
   const [shiftsUser, setShiftsUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
   
   console.log('UserPage roles:', roles);
 
@@ -51,7 +52,7 @@ export default function UserPage() {
   const handleAddUser = async (newUser) => {
     try {
       // Create user first
-  const userRes = await fetch(`${API_URL}/api/users`, {
+      const userRes = await fetch(`${API_URL}/api/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -65,14 +66,14 @@ export default function UserPage() {
       const userData = await userRes.json();
       // Add roles for user
       for (const role_id of newUser.roles) {
-  await fetch(`${API_URL}/api/user_roles`, {
+        await fetch(`${API_URL}/api/user_roles`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ user_id: userData.user_id, role_id })
         });
       }
       // Refetch users after adding
-  const res = await fetch(`${API_URL}/api/users`);
+      const res = await fetch(`${API_URL}/api/users`);
       const updatedUsers = await res.json();
       setUsers(updatedUsers);
     } catch (err) {
@@ -81,14 +82,13 @@ export default function UserPage() {
     setAddUserPopup(false);
   };
 
-  
   const handleDeleteUser = async (userId) => {
     try {
-  await fetch(`${API_URL}/api/users/${userId}`, {
+      await fetch(`${API_URL}/api/users/${userId}`, {
         method: 'DELETE'
       });
       // Refetch users after deleting
-  const res = await fetch(`${API_URL}/api/users`);
+      const res = await fetch(`${API_URL}/api/users`);
       const updatedUsers = await res.json();
       setUsers(updatedUsers);
     } catch (err) {
@@ -100,7 +100,7 @@ export default function UserPage() {
   if (checkingAuth) {
     return <div className="userpage-container"><h2>Checking permissions...</h2></div>;
   }
- 
+
   // Minimum required role for this page
   const requiredRole = 'admin';
   // Find highest role of current user
@@ -110,56 +110,57 @@ export default function UserPage() {
   if (!userHighestRole || roleHierarchy.indexOf(userHighestRole) < roleHierarchy.indexOf(requiredRole)) {
     return <div className="userpage-container"><h2>Access denied. Admins only.</h2></div>;
   }
+
+  // Get all unique roles for filter dropdown, hide 'superadmin' unless user is superadmin
+  let allRoles = Array.from(new Set(users.flatMap(u => Array.isArray(u.roles) ? u.roles : [])));
+  if (!roles.includes('superadmin')) {
+    allRoles = allRoles.filter(role => role !== 'superadmin');
+  }
+
+  // Filter users by search and role
+  const filteredUsers = users.filter(user => {
+    const nameMatch =
+      user.username?.toLowerCase().includes(search.toLowerCase()) ||
+      user.name?.toLowerCase().includes(search.toLowerCase());
+    const roleMatch =
+      !roleFilter || (Array.isArray(user.roles) && user.roles.includes(roleFilter));
+    return nameMatch && roleMatch;
+  });
+
   return (
     <div className="userpage-container">
       <h2 className="userpage-title">All Users</h2>
-      <table className="userpage-table">
-        <thead>
-          <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(user => (
-            <tr key={user.user_id}>
-              <td>{user.username}</td>
-              <td>{user.email}</td>
-              <td>{
-                Array.isArray(user.roles)
-                  ? [
-                      ...(
-                        user.roles.includes('user')
-                          ? []
-                          : user.roles.length > 0 ? ['user'] : []
-                      ),
-                      ...user.roles.filter(role => role !== 'superadmin' || (roles && roles.includes('superadmin')))
-                    ].join(', ')
-                  : user.roles || ''
-              }</td>
-              <td>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ cursor: 'pointer', marginRight: 10 }} title="Edit Shifts" onClick={() => setShiftsUser(user)}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#43a047" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><circle cx="12" cy="16" r="2"/><path d="M12 14v2"/></svg>
-                  </span>
-                  {hasRequiredRole(roles, 'admin') && (
-                    <>
-                      <span style={{ cursor: 'pointer', marginRight: 10 }} title="Edit" onClick={() => setEditUser(user)}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1976d2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
-                      </span>
-                      <span style={{ cursor: 'pointer', marginLeft: 'auto' }} title="Delete" onClick={() => setDeleteUser(user)}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d32f2f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m5 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                      </span>
-                    </>
-                  )}
-                </div>
-              </td>
-            </tr>
+      <div style={{ display: 'flex', gap: 16, marginBottom: 24, alignItems: 'center', flexWrap: 'wrap' }}>
+        <input
+          type="text"
+          placeholder="Search by name..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #bbb', fontSize: '1rem', minWidth: 180 }}
+        />
+        <select
+          value={roleFilter}
+          onChange={e => setRoleFilter(e.target.value)}
+          style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #bbb', fontSize: '1rem', minWidth: 120 }}
+        >
+          <option value="">All Roles</option>
+          {allRoles.map(role => (
+            <option key={role} value={role}>{role}</option>
           ))}
-        </tbody>
-      </table>
+        </select>
+      </div>
+      <div className="user-cards-list">
+        {filteredUsers.map(user => (
+          <UserCard
+            key={user.user_id}
+            user={user}
+            roles={roles}
+            onEdit={setEditUser}
+            onDelete={setDeleteUser}
+            onShowShifts={setShiftsUser}
+          />
+        ))}
+      </div>
       {hasRequiredRole(roles, 'admin') && (
         <button style={{ marginTop: '2rem', padding: '10px 24px', fontSize: '1.1rem', background: '#1976d2', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }} onClick={() => setAddUserPopup(true)}>Add User</button>
       )}

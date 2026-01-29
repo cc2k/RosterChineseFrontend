@@ -1,0 +1,125 @@
+
+body.dark-mode .user-card {
+  background: #23272f;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.32);
+  border: 1.5px solid #32363e;
+  outline: 0.5px solid #181a20;
+  transition: background 0.2s;
+}
+body.dark-mode .user-card-header h3,
+body.dark-mode .user-card-body p,
+body.dark-mode .user-card-body strong,
+body.dark-mode .user-role-pill {
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+}
+body.dark-mode .user-role-pill {
+  background: #1a263a;
+  color: #e3eafc;
+  border: 1px solid #274472;
+  opacity: 1;
+}
+
+.user-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  align-items: stretch;
+}
+
+.user-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 0.4rem 0.5rem;
+  min-width: 260px;
+  max-width: 340px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  font-size: 0.89rem;
+  color: #1a1a1a;
+  transition: background 0.2s;
+}
+.user-card-header h3 {
+  color: #111;
+}
+.user-card-body p,
+.user-card-body strong {
+  color: #222;
+}
+
+.user-card-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+
+.user-role-pill {
+  background: #e0e7ef;
+  color: #174ea6;
+  border-radius: 8px;
+  padding: 0.08rem 0.6rem;
+  font-size: 0.92rem;
+  font-weight: 400;
+  border: 1px solid #b6c6e3;
+  display: inline-block;
+  margin-right: 0.1rem;
+  margin-bottom: 0.1rem;
+  opacity: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  .user-role-pill {
+    background: #1a263a;
+    color: #e3eafc;
+    border: 1px solid #274472;
+    opacity: 1;
+  }
+}
+
+.user-card-body {
+  margin-bottom: 0.2rem;
+}
+
+.user-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-left: auto;
+  align-items: flex-end;
+}
+
+.user-card-actions button {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 0.28rem 0.7rem;
+  font-size: 0.93rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  box-shadow: 0 1px 3px rgba(25, 118, 210, 0.08);
+}
+
+.user-card-actions button.delete-btn {
+  background: #d32f2f;
+  color: #fff;
+}
+.user-card-actions button.delete-btn:hover {
+  background: #a31515;
+  color: #fff;
+}
+
+.user-card-actions button:hover {
+  background: #1251a3;
+  color: #fff;
+}

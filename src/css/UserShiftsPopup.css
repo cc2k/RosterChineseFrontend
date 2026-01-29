@@ -1,0 +1,5 @@
+.user-shifts-btn-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

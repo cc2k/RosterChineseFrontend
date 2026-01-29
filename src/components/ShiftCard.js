@@ -1,4 +1,6 @@
 
+
+import '../css/ShiftCard.css';
 import React from 'react';
 
 export default function ShiftCard({ children, style = {} }) {
